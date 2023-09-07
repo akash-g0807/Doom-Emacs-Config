@@ -674,6 +674,27 @@
   (org-clock-report-include-clocking-task t)
   (org-show-notification-handler (lambda (msg) (alert msg))))
 
+;; PRG LANGUAGES
+
+(use-package python :ensure nil :after org)
+(use-package ob-C :ensure nil :after org)
+(use-package ob-css :ensure nil :after org)
+(use-package ob-dot :ensure nil :after org)
+(use-package ob-emacs-lisp :ensure nil :after org)
+(use-package ob-gnuplot :ensure nil :after org)
+(use-package ob-java :ensure nil :after org)
+(use-package ob-js :ensure nil :after org)
+(use-package ob-latex
+  :ensure nil
+  :after org
+  :custom (org-latex-compiler "xelatex"))
+(use-package ob-makefile :ensure nil :after org)
+(use-package ob-org :ensure nil :after org)
+
+(use-package ob-python :ensure nil :after org)
+(use-package ob-shell :ensure nil :after org)
+(use-package ob-sql :ensure nil :after org)
+
 
 ;;;;;;;;;;;;;; ORG ROAM AND JOURNAL ;;;;;;;;;;;;;;;;;;
 
