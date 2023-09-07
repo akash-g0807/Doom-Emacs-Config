@@ -44,7 +44,7 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-
+(setq-default cache-long-scans nil)
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
@@ -225,8 +225,8 @@
   :hook (after-init . global-emojify-mode))
 
 
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 28)
-      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 28)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 30)
+      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 30)
       doom-big-font (font-spec :family "JetBrainsMono Nerd Font" :size 48))
 
 (custom-set-faces!
@@ -462,11 +462,17 @@
 (use-package ox-gemini)
 
 ;;;;;;;;;;;;;;;;;;;;;; ORG  BABEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq exec-path (append exec-path '("/usr/bin")))
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
 (with-eval-after-load 'org
   (org-babel-do-load-languages
       'org-babel-load-languages
       '((emacs-lisp . t)
-      (python . t)))
+      (python . t)
+      (latex . t)))
 
   (push '("conf-unix" . conf-unix) org-src-lang-modes))
 

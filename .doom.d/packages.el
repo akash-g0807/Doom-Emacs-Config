@@ -84,3 +84,7 @@
 (package! auctex-latexmk)
 (package! auto-dictionary)
 (package! json-mode)
+(package! ob-async)
+(package! async)
+(package! json)
+(package! seq)
