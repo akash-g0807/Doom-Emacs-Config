@@ -1253,3 +1253,218 @@
     "w K" '(buf-move-up :wk "Buffer move up")
     "w L" '(buf-move-right :wk "Buffer move right"))
 )
+
+
+;; Runtime performance
+(setq gc-cons-threshold (* 2 1000 1000))
+
+;; MOUSE SCROLLING
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+
+
+;; spell check
+
+(use-package flyspell)
+(use-package flycheck-aspell)
+(dolist (hook '(text-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+
+(dolist (hook '(change-log-mode-hook log-edit-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode -1))))
+
+
+(eval-after-load "flyspell"
+  '(progn
+     (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+     (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+
+(defun flyspell-english ()
+  (interactive)
+  (ispell-change-dictionary "default")
+  (flyspell-buffer))
+(setq ispell-program-name "aspell")
+(setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB"))
+(setq spell-fu-directory "~/+STORE/dictionary") ;; Please create this directory manually.
+(setq ispell-personal-dictionary "~/+STORE/dictionary/.pws")
+(setq ispell-dictionary "en")
+
+(use-package lsp-ltex
+  :disabled
+  :custom
+  (lsp-ltex-enabled nil)
+  (lsp-ltex-mother-tongue "fr"))
+
+(use-package ispell
+  :preface
+  (defun my/switch-language ()
+    "Switch between the English and French for ispell, flyspell, and LanguageTool."
+    (interactive)
+    (let* ((current-dictionary ispell-current-dictionary)
+           (new-dictionary (if (string= current-dictionary "en_GB") "fr_BE" "en_GB")))
+      (ispell-change-dictionary new-dictionary)
+      (if (string= new-dictionary "fr_GB")
+          (progn
+            (setq lsp-ltex-language "fr"))
+        (progn
+          (setq lsp-ltex-language "en-GB")))
+      (flyspell-buffer)
+      (message "[✓] Dictionary switched to %s" new-dictionary)))
+  :custom
+  (ispell-hunspell-dict-paths-alist
+   '(("en_GB" "/usr/share/hunspell/en_GB.aff")
+     ("fr_BE" "/usr/share/hunspell/fr_BE.aff")))
+  ;; Save words in the personal dictionary without asking.
+  (ispell-silently-savep t)
+  :config
+  (setenv "LANG" "en_GB")
+  (cond ((executable-find "hunspell")
+         (setq ispell-program-name "hunspell")
+         (setq ispell-local-dictionary-alist '(("en_GB"
+                                                "[[:alpha:]]"
+                                                "[^[:alpha:]]"
+                                                "['’-]"
+                                                t
+                                                ("-d" "en_GB" )
+                                                nil
+                                                utf-8)
+                                               ("fr_BE"
+                                                "[[:alpha:]ÀÂÇÈÉÊËÎÏÔÙÛÜàâçèéêëîïôùûü]"
+                                                "[^[:alpha:]ÀÂÇÈÉÊËÎÏÔÙÛÜàâçèéêëîïôùûü]"
+                                                "['’-]"
+                                                t
+                                                ("-d" "fr_BE")
+                                                nil
+                                                utf-8))))
+        ((executable-find "aspell")
+         (setq ispell-program-name "aspell")
+         (setq ispell-extra-args '("--sug-mode=ultra"))))
+  ;; Ignore file sections for spell checking.
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_align" . "#\\+end_align"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_align*" . "#\\+end_align*"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_equation" . "#\\+end_equation"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_equation*" . "#\\+end_equation*"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_labeling" . "#\\+end_labeling"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("\\$" . "\\$"))
+  (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+  (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")))
+
+;;;;;;;;;;;;;;;;;;;;;;;; LATEX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-page)
+  (setq pdf-annot-activate-created-annotations t)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward)
+  (add-hook 'pdf-view-mode-hook (lambda ()
+				  (bms/pdf-midnite-amber))) ; automatically turns on midnight-mode for pdfs
+  )
+
+(use-package auctex-latexmk
+  :ensure t
+  :config
+  (auctex-latexmk-setup)
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t))
+
+(use-package reftex
+  :ensure t
+  :defer t
+  :config
+  (setq reftex-cite-prompt-optional-args t)) ;; Prompt for empty optional arguments in cite
+
+(use-package auto-dictionary
+  :ensure t
+  :init(add-hook 'flyspell-mode-hook (lambda () (auto-dictionary-mode 1))))
+
+(use-package company-auctex
+  :ensure t
+  :init (company-auctex-init))
+
+(use-package company-math
+  :ensure t
+)
+
+(defun my-latex-mode-setup ()
+  (setq-local company-backends
+              (append '((company-math-symbols-latex company-latex-commands))
+                      company-backends)))
+
+(add-hook 'tex-mode-hook 'my-latex-mode-setup)
+(add-hook 'TeX-mode-hook 'my-latex-mode-setup)
+
+(use-package tex
+  :ensure auctex
+  :mode ("\\.tex\\'" . latex-mode)
+  :config (progn
+	    (setq TeX-source-correlate-mode t)
+	    (setq TeX-source-correlate-method 'synctex)
+	    (setq TeX-auto-save t)
+	    (setq TeX-parse-self t)
+	    (setq-default TeX-master "paper.tex")
+	    (setq reftex-plug-into-AUCTeX t)
+	    (pdf-tools-install)
+	    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+		  TeX-source-correlate-start-server t)
+	    ;; Update PDF buffers after successful LaTeX runs
+	    (add-hook 'TeX-after-compilation-finished-functions
+		      #'TeX-revert-document-buffer)
+	    (add-hook 'LaTeX-mode-hook
+		      (lambda ()
+			(reftex-mode t)
+			(flyspell-mode t)))
+	    ))
+(use-package latex-preview-pane)
+
+(require 'latex)					;(add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
+(add-hook 'LaTeX-mode-hook ;this are the hooks I want to enable during LaTeX-mode
+	  (lambda()
+	    (turn-on-reftex) ;enable reftex
+	   ; (turn-on-cdlatex) ; I am not using cdlatex mauch.
+	    (set (make-local-variable 'company-backends) '((separate: company-reftex-labels company-reftex-citations) (separate: company-auctex-symbols company-auctex-environments company-capf company-auctex-macros) company-math-symbols-latex
+	    company-latex-commands ))
+	    (rainbow-delimiters-mode)
+	    (setq TeX-auto-save t) ;enable autosave on during LaTeX-mode
+	    (setq TeX-parse-self t) ; enable autoparsing
+	    (setq TeX-save-query nil) ;
+	    (setq TeX-source-correlate-method 'synctex) ; enable synctex
+
+	    (setq TeX-source-correlate-mode t) ; enable text-source-correlate using synctex
+	    (TeX-fold-mode 1); enableing tex fold mode for better readability.
+;;	    (TeX-fold-buffer 1)
+	    (setq-default TeX-master nil)
+	    (global-set-key (kbd "C-c C-g") 'pdf-sync-forward-search) ;sync from text to pdf
+	    (add-hook 'TeX-after-compilation-finished-functions
+		      #'TeX-revert-document-buffer) ; reload pdf buffer
+	    (setq reftex-plug-into-AUCTeX t) ; enable auctex
+	    (setq reftex-bibliography-commands '("bibliography" "nobibliography" "addbibresource"))
+	    (local-set-key [C-tab] 'TeX-complete-symbol) ;tex complete symbol
+	    ; could be ispell as well, depending on your preferences
+	    (setq ispell-program-name "aspell")
+; this can obviously be set to any language your spell-checking program supports
+	    (setq ispell-dictionary "english")
+	    (flyspell-mode) ; flyspell mode enable
+	    (flyspell-buffer); flyspell buffer
+	    (turn-on-auto-fill)
+	    (visual-line-mode)
+	    (LaTeX-math-mode)
+	    )
+	  )
+
+
+(use-package lsp-latex
+  :if (executable-find "texlab")
+  ;; To properly load `lsp-latex', the `require' instruction is important.
+  :hook (LaTeX-mode . (lambda ()
+                        (require 'lsp-latex)
+                        (lsp-deferred)))
+  :custom (lsp-latex-build-on-save t))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;; LATEX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -81,3 +81,6 @@
 (package! platformio-mode)
 (package! org-wild-notifier)
 (package! vterm-toggle)
+(package! auctex-latexmk)
+(package! auto-dictionary)
+(package! json-mode)
