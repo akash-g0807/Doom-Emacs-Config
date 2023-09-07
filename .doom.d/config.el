@@ -1,3 +1,5 @@
+;;; config.el -*- lexical-binding: t; -*-
+
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -86,8 +88,6 @@
                                       (unless (and wl-copy-p (process-live-p wl-copy-p))
                                         (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
 
-
-
 (defun my-dired-up-dir ()
   "Go up a directory."
   (interactive)
@@ -113,7 +113,6 @@
 
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
-
 
 ;; iBUFFER
 ;;
@@ -226,17 +225,17 @@
   :hook (after-init . global-emojify-mode))
 
 
-(setq doom-font (font-spec :family "JetBrains Mono" :size 28)
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 28)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 28)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 32))
-(after! doom-themes
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t))
+      doom-big-font (font-spec :family "JetBrainsMono Nerd Font" :size 48))
+
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 
-(setq! doom-unicode-font (font-spec :family "MesloLGS NF" :size 13))
+
+(setq! doom-unicode-font (font-spec :family "JetBrainsMono Nerd Font" :size 36))
+
 ;; IVY
 ;;
 (setq ivy-posframe-display-functions-alist
@@ -257,6 +256,7 @@
         (t . 10)))
 (ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
                       ;
+
                       ;
 (map! :leader
       (:prefix ("v" . "Ivy")

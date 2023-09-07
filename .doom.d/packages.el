@@ -48,7 +48,7 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
-;
+
 (package! flycheck-aspell)
 (package! calfw)
 (package! calfw-org)
