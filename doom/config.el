@@ -1,82 +1,3 @@
-;;; config.el -*- lexical-binding: t; -*-
-
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; sync' after modifying this file!
-
-
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets. It is optional.
-;; (setq user-full-name "John Doe"
-;;       user-mail-address "john@doe.com")
-
-;; Doom exposes five (optional) variables for controlling fonts in Doom:
-;;
-;; - `doom-font' -- the primary font to use
-;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
-;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
-;;   presentations or streaming.
-;; - `doom-unicode-font' -- for unicode glyphs
-;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
-;;
-;; See 'C-h v doom-font' for documentation and more examples of what they
-;; accept. For example:
-;;
-;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
-;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
-;;
-;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
-;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
-;; refresh your font settings. If Emacs still can't find your font, it likely
-;; wasn't installed correctly. Font issues are rarely Doom issues!
-
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
-
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
-
-(setq-default cache-long-scans nil)
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
-;;
-;;   (after! PACKAGE
-;;     (setq x y))
-;;
-;; The exceptions to this rule:
-;;
-;;   - Setting file/directory variables (like `org-directory')
-;;   - Setting variables which explicitly tell you to set them before their
-;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
-;;   - Setting doom variables (which start with 'doom-' or '+').
-;;
-;; Here are some additional functions/macros that will help you configure Doom.
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
-;; This will open documentation for it, including demos of how they are used.
-;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
-;; etc).
-;;
-;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
-;; they are implemented.
-
 (when (getenv "WAYLAND_DISPLAY")
   (setq wl-copy-p nil
         interprogram-cut-function (lambda (text)
@@ -88,20 +9,11 @@
                                       (unless (and wl-copy-p (process-live-p wl-copy-p))
                                         (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
 
-(defun my-dired-up-dir ()
-  "Go up a directory."
-  (interactive)
-  (let ((current-dir (dired-current-directory)))
-    (find-alternate-file "..")
-    (dired-goto-file current-dir)))
-
-;; BEACON
-;;
 (beacon-mode 1)
 
-;;BOOKMARKS
-;;
-(setq bookmark-default-file "~/.doom.d/bookmarks")
+(setq-default cache-long-scans nil)
+
+(setq bookmark-default-file "~/.config/doom/bookmarks")
 
 (map! :leader
       (:prefix ("b". "buffer")
@@ -110,12 +22,9 @@
        :desc "Delete bookmark"                         "M" #'bookmark-set
        :desc "Save current bookmarks to bookmark file" "w" #'bookmark-save))
 
-
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
 
-;; iBUFFER
-;;
 (evil-define-key 'normal ibuffer-mode-map
   (kbd "f c") 'ibuffer-filter-by-content
   (kbd "f d") 'ibuffer-filter-by-directory
@@ -126,20 +35,68 @@
   (kbd "g h") 'ibuffer-do-kill-lines
   (kbd "g H") 'ibuffer-update)
 
+;; https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-than-3-months
+(defun dt/year-calendar (&optional year)
+  (interactive)
+  (require 'calendar)
+  (let* (
+      (current-year (number-to-string (nth 5 (decode-time (current-time)))))
+      (month 0)
+      (year (if year year (string-to-number (format-time-string "%Y" (current-time))))))
+    (switch-to-buffer (get-buffer-create calendar-buffer))
+    (when (not (eq major-mode 'calendar-mode))
+      (calendar-mode))
+    (setq displayed-month month)
+    (setq displayed-year year)
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    ;; horizontal rows
+    (dotimes (j 4)
+      ;; vertical columns
+      (dotimes (i 3)
+        (calendar-generate-month
+          (setq month (+ month 1))
+          year
+          ;; indentation / spacing between months
+          (+ 5 (* 25 i))))
+      (goto-char (point-max))
+      (insert (make-string (- 10 (count-lines (point-min) (point-max))) ?\n))
+      (widen)
+      (goto-char (point-max))
+      (narrow-to-region (point-max) (point-max)))
+    (widen)
+    (goto-char (point-min))
+    (setq buffer-read-only t)))
 
-;; TABS
-;;
-(evil-define-key 'normal ibuffer-mode-map
-  (kbd "f c") 'ibuffer-filter-by-content
-  (kbd "f d") 'ibuffer-filter-by-directory
-  (kbd "f f") 'ibuffer-filter-by-filename
-  (kbd "f m") 'ibuffer-filter-by-mode
-  (kbd "f n") 'ibuffer-filter-by-name
-  (kbd "f x") 'ibuffer-filter-disable
-  (kbd "g h") 'ibuffer-do-kill-lines
-  (kbd "g H") 'ibuffer-update)
+(defun dt/scroll-year-calendar-forward (&optional arg event)
+  "Scroll the yearly calendar by year in a forward direction."
+  (interactive (list (prefix-numeric-value current-prefix-arg)
+                     last-nonmenu-event))
+  (unless arg (setq arg 0))
+  (save-selected-window
+    (if (setq event (event-start event)) (select-window (posn-window event)))
+    (unless (zerop arg)
+      (let* (
+              (year (+ displayed-year arg)))
+        (dt/year-calendar year)))
+    (goto-char (point-min))
+    (run-hooks 'calendar-move-hook)))
 
-;;TABS
+(defun dt/scroll-year-calendar-backward (&optional arg event)
+  "Scroll the yearly calendar by year in a backward direction."
+  (interactive (list (prefix-numeric-value current-prefix-arg)
+                     last-nonmenu-event))
+  (dt/scroll-year-calendar-forward (- (or arg 1)) event))
+
+(map! :leader
+      :desc "Scroll year calendar backward" "<left>" #'dt/scroll-year-calendar-backward
+      :desc "Scroll year calendar forward" "<right>" #'dt/scroll-year-calendar-forward)
+
+(defalias 'year-calendar 'dt/year-calendar)
+
+(use-package! calfw)
+(use-package! calfw-org)
+
 (setq centaur-tabs-set-bar 'over
       centaur-tabs-set-icons t
       centaur-tabs-gray-out-icons 'buffer
@@ -155,7 +112,10 @@
                                                (kbd "g <down>")  'centaur-tabs-forward-group
                                                (kbd "g <up>")    'centaur-tabs-backward-group)
 
-;;DIRED
+(map! :leader
+      (:prefix ("c h" . "Help info from Clippy")
+       :desc "Clippy describes function under point" "f" #'clippy-describe-function
+       :desc "Clippy describes variable under point" "v" #'clippy-describe-variable))
 
 (map! :leader
       (:prefix ("d" . "dired")
@@ -165,7 +125,6 @@
        (:map dired-mode-map
         :desc "Peep-dired image previews" "d p" #'peep-dired
         :desc "Dired view file"           "d v" #'dired-view-file)))
-
 
 (evil-define-key 'normal dired-mode-map
   (kbd "M-RET") 'dired-display-file
@@ -204,40 +163,147 @@
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
 
-;; PEEP DIRED
-;;
 (evil-define-key 'normal peep-dired-mode-map
   (kbd "j") 'peep-dired-next-file
   (kbd "k") 'peep-dired-prev-file)
 (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
 
-
 (setq delete-by-moving-to-trash t
       trash-directory "~/.local/share/Trash/files/")
-
 
 (setq doom-theme 'doom-one)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
 
+(ednc-mode 1)
+
+(defun show-notification-in-buffer (old new)
+  (let ((name (format "Notification %d" (ednc-notification-id (or old new)))))
+    (with-current-buffer (get-buffer-create name)
+      (if new (let ((inhibit-read-only t))
+                (if old (erase-buffer) (ednc-view-mode))
+                (insert (ednc-format-notification new t))
+                (pop-to-buffer (current-buffer)))
+        (kill-buffer)))))
+
+(add-hook 'ednc-notification-presentation-functions
+          #'show-notification-in-buffer)
+
+(evil-define-key 'normal ednc-view-mode-map
+  (kbd "d")   'ednc-dismiss-notification
+  (kbd "RET") 'ednc-invoke-action
+  (kbd "e")   'ednc-toggle-expanded-view)
+
+(setq elfeed-goodies/entry-pane-size 0.5)
+
+(evil-define-key 'normal elfeed-show-mode-map
+  (kbd "J") 'elfeed-goodies/split-show-next
+  (kbd "K") 'elfeed-goodies/split-show-prev)
+(evil-define-key 'normal elfeed-search-mode-map
+  (kbd "J") 'elfeed-goodies/split-show-next
+  (kbd "K") 'elfeed-goodies/split-show-prev)
+(setq elfeed-feeds (quote
+                    (("https://www.reddit.com/r/linux.rss" reddit linux)
+                     ("https://www.reddit.com/r/commandline.rss" reddit commandline)
+                     ("https://www.reddit.com/r/distrotube.rss" reddit distrotube)
+                     ("https://www.reddit.com/r/emacs.rss" reddit emacs)
+                     ("https://www.gamingonlinux.com/article_rss.php" gaming linux)
+                     ("https://hackaday.com/blog/feed/" hackaday linux)
+                     ("https://opensource.com/feed" opensource linux)
+                     ("https://linux.softpedia.com/backend.xml" softpedia linux)
+                     ("https://itsfoss.com/feed/" itsfoss linux)
+                     ("https://www.zdnet.com/topic/linux/rss.xml" zdnet linux)
+                     ("https://www.phoronix.com/rss.php" phoronix linux)
+                     ("http://feeds.feedburner.com/d0od" omgubuntu linux)
+                     ("https://www.computerworld.com/index.rss" computerworld linux)
+                     ("https://www.networkworld.com/category/linux/index.rss" networkworld linux)
+                     ("https://www.techrepublic.com/rssfeeds/topic/open-source/" techrepublic linux)
+                     ("https://betanews.com/feed" betanews linux)
+                     ("http://lxer.com/module/newswire/headlines.rss" lxer linux))))
+
+(emms-all)
+(emms-default-players)
+(emms-mode-line 1)
+(emms-playing-time 1)
+(setq emms-source-file-default-directory "~/Music/"
+      emms-playlist-buffer-name "*Music*"
+      emms-info-asynchronously t
+      emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
+(map! :leader
+      (:prefix ("a" . "EMMS audio player")
+       :desc "Go to emms playlist"      "a" #'emms-playlist-mode-go
+       :desc "Emms pause track"         "x" #'emms-pause
+       :desc "Emms stop track"          "s" #'emms-stop
+       :desc "Emms play previous track" "p" #'emms-previous
+       :desc "Emms play next track"     "n" #'emms-next))
 
 (use-package emojify
   :hook (after-init . global-emojify-mode))
 
+(map! :leader
+      (:prefix ("e". "evaluate/ERC/EWW")
+       :desc "Launch ERC with TLS connection" "E" #'erc-tls))
 
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 30)
+(setq erc-prompt (lambda () (concat "[" (buffer-name) "]"))
+      erc-server "irc.libera.chat"
+      erc-nick "distrotube"
+      erc-user-full-name "Derek Taylor"
+      erc-track-shorten-start 24
+      erc-autojoin-channels-alist '(("irc.libera.chat" "#archlinux" "#linux" "#emacs"))
+      erc-kill-buffer-on-part t
+      erc-fill-column 100
+      erc-fill-function 'erc-fill-static
+      erc-fill-static-center 20
+      ;; erc-auto-query 'bury
+      )
+
+(map! :leader
+      (:prefix ("e". "evaluate/ERC/EWW")
+       :desc "Evaluate elisp in buffer"  "b" #'eval-buffer
+       :desc "Evaluate defun"            "d" #'eval-defun
+       :desc "Evaluate elisp expression" "e" #'eval-expression
+       :desc "Evaluate last sexpression" "l" #'eval-last-sexp
+       :desc "Evaluate elisp in region"  "r" #'eval-region))
+
+(setq browse-url-browser-function 'eww-browse-url)
+(map! :leader
+      :desc "Search web for text between BEG/END"
+      "s w" #'eww-search-words
+      (:prefix ("e" . "evaluate/ERC/EWW")
+       :desc "Eww web browser" "w" #'eww
+       :desc "Eww reload page" "R" #'eww-reload))
+
+(autoload 'exwm-enable "exwm-config.el")
+
+(setq doom-font (font-spec :family "JetBrains Mono" :size 30)
       doom-variable-pitch-font (font-spec :family "Ubuntu" :size 30)
-      doom-big-font (font-spec :family "JetBrainsMono Nerd Font" :size 48))
-
+      doom-big-font (font-spec :family "JetBrains Mono" :size 48))
+(after! doom-themes
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t))
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 
+(defun dt/insert-todays-date (prefix)
+  (interactive "P")
+  (let ((format (cond
+                 ((not prefix) "%A, %B %d, %Y")
+                 ((equal prefix '(4)) "%m-%d-%Y")
+                 ((equal prefix '(16)) "%Y-%m-%d"))))
+    (insert (format-time-string format))))
 
-(setq! doom-unicode-font (font-spec :family "JetBrainsMono Nerd Font" :size 36))
+(require 'calendar)
+(defun dt/insert-any-date (date)
+  "Insert DATE using the current locale."
+  (interactive (list (calendar-read-date)))
+  (insert (calendar-date-string date)))
 
-;; IVY
-;;
+(map! :leader
+      (:prefix ("i d" . "Insert date")
+        :desc "Insert any date"    "a" #'dt/insert-any-date
+        :desc "Insert todays date" "t" #'dt/insert-todays-date))
+
 (setq ivy-posframe-display-functions-alist
       '((swiper                     . ivy-posframe-display-at-point)
         (complete-symbol            . ivy-posframe-display-at-point)
@@ -255,16 +321,12 @@
         (dmenu . 20)
         (t . 10)))
 (ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
-                      ;
 
-                      ;
 (map! :leader
       (:prefix ("v" . "Ivy")
        :desc "Ivy push view" "v p" #'ivy-push-view
        :desc "Ivy switch view" "v s" #'ivy-switch-view))
 
-;; LINE SETTINGS
-;;
 (setq display-line-numbers-type t)
 (map! :leader
       :desc "Comment or uncomment lines"      "TAB TAB" #'comment-line
@@ -274,14 +336,28 @@
        :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
        :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines))
 
+(custom-set-faces
+ '(markdown-header-face ((t (:inherit font-lock-function-name-face :weight bold :family "variable-pitch"))))
+ '(markdown-header-face-1 ((t (:inherit markdown-header-face :height 1.7))))
+ '(markdown-header-face-2 ((t (:inherit markdown-header-face :height 1.6))))
+ '(markdown-header-face-3 ((t (:inherit markdown-header-face :height 1.5))))
+ '(markdown-header-face-4 ((t (:inherit markdown-header-face :height 1.4))))
+ '(markdown-header-face-5 ((t (:inherit markdown-header-face :height 1.3))))
+ '(markdown-header-face-6 ((t (:inherit markdown-header-face :height 1.2)))))
 
+(setq minimap-window-location 'right)
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Toggle minimap-mode" "m" #'minimap-mode))
 
-;; MOUSE SUPPORT
+(set-face-attribute 'mode-line nil :font "Ubuntu Mono-13")
+(setq doom-modeline-height 30     ;; sets modeline height
+      doom-modeline-bar-width 5   ;; sets right bar width
+      doom-modeline-persp-name t  ;; adds perspective name to modeline
+      doom-modeline-persp-icon t) ;; adds folder icon next to persp name
+
 (xterm-mouse-mode 1)
 
-
-;; NEOTREE
-;;
 (after! neotree
   (setq neo-smart-open t
         neo-window-fixed-size nil))
@@ -291,12 +367,22 @@
       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
       :desc "Open directory in neotree"  "d n" #'neotree-dir)
 
-;; ORG MODE
-;;
+(map! :leader
+      (:prefix ("=" . "open file")
+       :desc "Edit agenda file"      "=" #'(lambda () (interactive) (find-file "~/.config/doom/start.org"))
+       :desc "Edit agenda file"      "a" #'(lambda () (interactive) (find-file "~/Org/agenda.org"))
+       :desc "Edit doom config.org"  "c" #'(lambda () (interactive) (find-file "~/.config/doom/config.org"))
+       :desc "Edit doom init.el"     "i" #'(lambda () (interactive) (find-file "~/.config/doom/init.el"))
+       :desc "Edit doom packages.el" "p" #'(lambda () (interactive) (find-file "~/.config/doom/packages.el"))))
+(map! :leader
+      (:prefix ("= e" . "open eshell files")
+       :desc "Edit eshell aliases"   "a" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
+       :desc "Edit eshell profile"   "p" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/profile"))))
+
 (map! :leader
       :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
-  (setq org-directory "~/Org/NOTES/"
+  (setq org-directory "~/Org/"
         org-default-notes-file (expand-file-name "notes.org" org-directory)
         org-ellipsis " ▼ "
         org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
@@ -314,34 +400,61 @@
         org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
           '((sequence
              "TODO(t)"           ; A task that is ready to be tackled
-             "ASSIGNMENTS(a)"           ; assignments
+             "ASSIGNMENTS(a)"    ; University Assignments
+             "BLOG(b)"           ; Blog writing assignments
+             "GYM(g)"            ; Things to accomplish at the gym
              "PROJ(p)"           ; A project that contains other tasks
-             "ROCKETRY(r)"          ; ROCKETRY assignments
+             "ROCKETRY(r)"       ; Work for York Aerospace and Rocketry(YAR)
+             "VIDEO(v)"          ; Video assignments
              "WAIT(w)"           ; Something is holding up this task
              "|"                 ; The pipe necessary to separate "active" states and "inactive" states
+             "BACKLOG(b)"
+             "PLAN(p)"
+             "READY(r)"
+             "ACTIVE(a)"
+             "REVIEW(v)"
+             "WAIT(w@/!)"
+             "HOLD(h)"
+             "COMPLETED(c)"
+             "CANC(k@)"
              "DONE(d)"           ; Task has been completed
              "CANCELLED(c)" )))) ; Task has been cancelled
-                                 ;
-                                 ;
-                                 ;
-;; ORG AGENDA
-;;
-(setq org-agenda-start-with-log-mode t)
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
 
- ; (setq org-agenda-files
-	;'("~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org"
-	;  "~/Projects/Code/emacs-from-scratch/OrgFiles/Habits.org"
-	 ; "~/Projects/Code/emacs-from-scratch/OrgFiles/Birthdays.org"))
+(after! org
+  (setq org-agenda-files '("~/Org/agenda.org")))
 
-  (require 'org-habit)
+(setq
+   ;; org-fancy-priorities-list '("[A]" "[B]" "[C]")
+   ;; org-fancy-priorities-list '("❗" "[B]" "[C]")
+   org-fancy-priorities-list '("🟥" "🟧" "🟨")
+   org-priority-faces
+   '((?A :foreground "#ff6c6b" :weight bold)
+     (?B :foreground "#98be65" :weight bold)
+     (?C :foreground "#c678dd" :weight bold))
+   org-agenda-block-separator 8411)
+
+(setq org-agenda-custom-commands
+      '(("v" "A better agenda view"
+         ((tags "PRIORITY=\"A\""
+                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                 (org-agenda-overriding-header "High-priority unfinished tasks:")))
+          (tags "PRIORITY=\"B\""
+                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                 (org-agenda-overriding-header "Medium-priority unfinished tasks:")))
+          (tags "PRIORITY=\"C\""
+                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                 (org-agenda-overriding-header "Low-priority unfinished tasks:")))
+          (tags "customtag"
+                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                 (org-agenda-overriding-header "Tasks marked with customtag:")))
+
+          (agenda "")
+          (alltodo "")))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ (require 'org-habit)
   (add-to-list 'org-modules 'org-habit)
   (setq org-habit-graph-column 60)
-
-  (setq org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
   (setq org-refile-targets
     '(("Archive.org" :maxlevel . 1)
@@ -410,96 +523,7 @@
       (todo "CANC"
             ((org-agenda-overriding-header "Cancelled Projects")
              (org-agenda-files org-agenda-files)))))))
-
-
-  (setq org-capture-templates
-    `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org" "Inbox")
-           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
-
-      ("j" "Journal Entries")
-      ("jj" "Journal" entry
-           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-           :clock-in :clock-resume
-           :empty-lines 1)
-      ("jm" "Meeting" entry
-           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-           :clock-in :clock-resume
-           :empty-lines 1)
-
-      ("w" "Workflows")
-      ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
-
-      ("m" "Metrics Capture")
-      ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
-       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-
-  (define-key global-map (kbd "C-c j")
-    (lambda () (interactive) (org-capture nil "jj")))
-
-(use-package! org-auto-tangle
-  :defer t
-  :hook (org-mode . org-auto-tangle-mode)
-  :config
-  (setq org-auto-tangle-default t))
-
-(defun dt/insert-auto-tangle-tag ()
-  "Insert auto-tangle tag in a literate config."
-  (interactive)
-  (evil-org-open-below 1)
-  (insert "#+auto_tangle: t ")
-  (evil-force-normal-state))
-
-(map! :leader
-      :desc "Insert auto_tangle tag" "i a" #'dt/insert-auto-tangle-tag)
-;; ORG EXPORT
-;;
-(use-package ox-man)
-(use-package ox-gemini)
-
-;;;;;;;;;;;;;;;;;;;;;; ORG  BABEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq exec-path (append exec-path '("/usr/bin")))
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-      'org-babel-load-languages
-      '((emacs-lisp . t)
-      (python . t)
-      (latex . t)))
-
-  (push '("conf-unix" . conf-unix) org-src-lang-modes))
-
-
-(with-eval-after-load 'org
-  ;; This is needed as of Org 9.2
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python")))
-
-  ;; Automatically tangle our Emacs.org config file when we save it
-(defun efs/org-babel-tangle-config ()
-  (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name user-emacs-directory))
-    ;; Dynamic scoping to the rescue
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
-;;;;;;;;;;;;;;;;;;;;;; ORG  BABEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;
-
-;;; MORE AGENDA STUFF
-
-  (use-package org-agenda
+ (use-package org-agenda
   :ensure nil
   :bind (:map org-agenda-mode-map
               ("C-n" . org-agenda-next-item)
@@ -573,20 +597,23 @@
   (org-habit-today-glyph ?‖)
   (org-track-ordered-property-with-tag t))
 
+(use-package! org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode)
+  :config
+  (setq org-auto-tangle-default t))
 
-  ;;; NOTIFIER
+(defun dt/insert-auto-tangle-tag ()
+  "Insert auto-tangle tag in a literate config."
+  (interactive)
+  (evil-org-open-below 1)
+  (insert "#+auto_tangle: t ")
+  (evil-force-normal-state))
 
-  (use-package org-wild-notifier
-  :after org
-  :custom
-  (alert-default-style 'libnotify)
-  (org-wild-notifier-notification-title "Agenda Reminder")
-  :config (org-wild-notifier-mode))
+(map! :leader
+      :desc "Insert auto_tangle tag" "i a" #'dt/insert-auto-tangle-tag)
 
-
-  ;;; ORG CAPTURE
-
-  (use-package org-capture
+(use-package org-capture
   :ensure nil
   :preface
   (defvar my/org-active-task-template
@@ -651,127 +678,32 @@
       :empty-lines 1
       :immediate-finish t))))
 
-;; ORG CLOCK
-(use-package org-clock
-  :ensure nil
-  :after org
-  :preface
-  (defun my/org-mode-ask-effort ()
-    "Ask for an effort estimate when clocking in."
-    (unless (org-entry-get (point) "Effort")
-      (let ((effort
-             (completing-read
-              "Effort: "
-              (org-entry-get-multivalued-property (point) "Effort"))))
-        (unless (equal effort "")
-          (org-set-property "Effort" effort)))))
-  :hook (org-clock-in-prepare-hook . my/org-mode-ask-effort)
-  :custom
-  (org-clock-clocktable-default-properties
-   '(:block thisweek :maxlevel 2 :scope agenda :link t :compact t :formula %
-            :step week :fileskip0 t :stepskip0 t :narrow 50
-            :properties ("Effort" "CLOCKSUM" "TODO")))
-  (org-clock-continuously nil)
-  (org-clock-in-switch-to-state "STARTED")
-  (org-clock-out-remove-zero-time-clocks t)
-  (org-clock-persist t)
-  ;;(org-clock-persist-file (expand-file-name (format "%s/emacs/org-clock-save.el" xdg-cache)))
-  (org-clock-persist-query-resume nil)
-  (org-clock-report-include-clocking-task t)
-  (org-show-notification-handler (lambda (msg) (alert msg))))
+(setq org-capture-templates
+    `(("t" "Tasks / Projects")
+      ("tt" "Task" entry (file+olp "~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org" "Inbox")
+           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-;; PRG LANGUAGES
+      ("j" "Journal Entries")
+      ("jj" "Journal" entry
+           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+           :clock-in :clock-resume
+           :empty-lines 1)
+      ("jm" "Meeting" entry
+           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
 
-(use-package python :ensure nil :after org)
-(use-package ob-C :ensure nil :after org)
-(use-package ob-css :ensure nil :after org)
-(use-package ob-dot :ensure nil :after org)
-(use-package ob-emacs-lisp :ensure nil :after org)
-(use-package ob-gnuplot :ensure nil :after org)
-(use-package ob-java :ensure nil :after org)
-(use-package ob-js :ensure nil :after org)
-(use-package ob-latex
-  :ensure nil
-  :after org
-  :custom (org-latex-compiler "xelatex"))
-(use-package ob-makefile :ensure nil :after org)
-(use-package ob-org :ensure nil :after org)
+      ("w" "Workflows")
+      ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
 
-(use-package ob-python :ensure nil :after org)
-(use-package ob-shell :ensure nil :after org)
-(use-package ob-sql :ensure nil :after org)
+      ("m" "Metrics Capture")
+      ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
+       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
-
-;;;;;;;;;;;;;; ORG ROAM AND JOURNAL ;;;;;;;;;;;;;;;;;;
-
-;; ORG ROAM
-;;
-(after! org
-  (setq org-roam-directory "~/Org/roam/"
-        org-roam-graph-viewer "/usr/bin/brave"))
-
-(map! :leader
-      (:prefix ("n r" . "org-roam")
-       :desc "Completion at point" "c" #'completion-at-point
-       :desc "Find node"           "f" #'org-roam-node-find
-       :desc "Show graph"          "g" #'org-roam-graph
-       :desc "Insert node"         "i" #'org-roam-node-insert
-       :desc "Capture to node"     "n" #'org-roam-capture
-       :desc "Toggle roam buffer"  "r" #'org-roam-buffer-toggle))
-(use-package org-roam
-  :after org
-  :init
-  (setq org-roam-v2-ack t)
-  (setq my/daily-note-filename "%<%Y-%m-%d>.org.gpg"
-        my/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
-  :custom
-  (org-roam-capture-templates
-   '(("d" "default" plain "%?"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                         "#+title: ${title}\n")
-      :unnarrowed t)))
-  (org-roam-completion-everywhere t)
-  (org-roam-dailies-directory "journal/")
-  (org-roam-dailies-capture-templates
-   `(("d" "default" plain
-      "* %?"
-      :if-new (file+head ,my/daily-note-filename
-                         ,my/daily-note-header)
-      :empty-lines 1)
-
-     ("j" "journal" plain
-      "** %<%I:%M %p>  :journal:\n\n%?\n\n"
-      :if-new (file+head+olp ,my/daily-note-filename
-                             ,my/daily-note-header
-                             ("Journal"))
-      :empty-lines 1)
-     ("m" "meeting" entry
-      "** %<%I:%M %p> - %^{Meeting Title}  :meeting:\n\n%?\n\n"
-      :if-new (file+head+olp ,my/daily-note-filename
-                             ,my/daily-note-header
-                             ("Meetings"))
-      :empty-lines 1)))
-  ;; (org-roam-directory "~/.personal/notes")
-  :custom (org-roam-graph-viewer "/usr/bin/firefox")
-  :config (org-roam-setup))
-
-;; ORG JOURNAL
-;;
-(setq org-journal-dir "~/Org/journal/"
-      org-journal-date-prefix "* "
-      org-journal-time-prefix "** "
-      org-journal-date-format "%B %d, %Y (%A) "
-      org-journal-file-format "%Y-%m-%d.org")
-
-
-
-
-;;;;;;;;;;;;;; ORG ROAM AND JOURNAL ;;;;;;;;;;;;;;;;;;
-
-
-;; ORG COLORS
-;;
-;;
 (defun dt/org-colors-doom-one ()
   "Enable Doom One colors for Org headers."
   (interactive)
@@ -935,40 +867,151 @@
 ;; Load our desired dt/org-colors-* theme on startup
 (dt/org-colors-doom-one)
 
-;; SHELLS
-;;
-(setq shell-file-name "/bin/zsh"
-      vterm-max-scrollback 5000)
-(setq eshell-rc-script "~/.config/doom/eshell/profile"
-      eshell-aliases-file "~/.config/doom/eshell/aliases"
-      eshell-history-size 5000
-      eshell-buffer-maximum-lines 5000
-      eshell-hist-ignoredups t
-      eshell-scroll-to-bottom-on-input t
-      eshell-destroy-buffer-when-process-dies t
-      eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+(use-package ox-man)
+(use-package ox-gemini)
+
+(setq org-journal-dir "~/nc/Org/journal/"
+      org-journal-date-prefix "* "
+      org-journal-time-prefix "** "
+      org-journal-date-format "%B %d, %Y (%A) "
+      org-journal-file-format "%Y-%m-%d.org")
+
+(setq org-publish-use-timestamps-flag nil)
+(setq org-export-with-broken-links t)
+(setq org-publish-project-alist
+      '(("distro.tube without manpages"
+         :base-directory "~/nc/gitlab-repos/distro.tube/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/"
+         :recursive t
+         :exclude "org-html-themes/.*\\|man-org/man*"
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man0p"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man0p/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man0p/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man1"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man1/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man1/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man1p"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man1p/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man1p/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man2"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man2/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man2/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man3"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man3/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man3/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man3p"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man3p/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man3p/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man4"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man4/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man4/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man5"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man5/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man5/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man6"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man6/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man6/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man7"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man7/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man7/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("man8"
+         :base-directory "~/nc/gitlab-repos/distro.tube/man-org/man8/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/distro.tube/html/man-org/man8/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+         ("org-static"
+         :base-directory "~/Org/website"
+         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+         :publishing-directory "~/public_html/"
+         :recursive t
+         :exclude ".*/org-html-themes/.*"
+         :publishing-function org-publish-attachment)
+         ("dtos.dev"
+         :base-directory "~/nc/gitlab-repos/dtos.dev/"
+         :base-extension "org"
+         :publishing-directory "~/nc/gitlab-repos/dtos.dev/html/"
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :headline-levels 4             ; Just the default for this project.
+         :auto-preamble t)
+
+      ))
+
+(after! org
+  (setq org-roam-directory "~/Org/roam/"
+        org-roam-graph-viewer "/usr/bin/firefox"))
+
 (map! :leader
-      :desc "Eshell"                 "e s" #'eshell
-      :desc "Eshell popup toggle"    "e t" #'+eshell/toggle
-      :desc "Counsel eshell history" "e h" #'counsel-esh-history
-      :desc "Vterm popup toggle"     "v t" #'+vterm/toggle)
+      (:prefix ("n r" . "org-roam")
+       :desc "Completion at point" "c" #'completion-at-point
+       :desc "Find node"           "f" #'org-roam-node-find
+       :desc "Show graph"          "g" #'org-roam-graph
+       :desc "Insert node"         "i" #'org-roam-node-insert
+       :desc "Capture to node"     "n" #'org-roam-capture
+       :desc "Toggle roam buffer"  "r" #'org-roam-buffer-toggle))
 
-
- ;; IRONY MODE CLANGD LSP
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
 (add-hook 'objc-mode-hook 'irony-mode)
 
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
-
-;; CCLS
-(use-package lsp-mode :commands lsp :ensure t)
-(use-package lsp-ui :commands lsp-ui-mode :ensure t)
-(use-package company-lsp
-  :ensure t
-  :commands company-lsp
-  :config (push 'company-lsp company-backends)) ;; add company-lsp as a backend
-;;
 
 (use-package ccls
   :ensure t
@@ -986,65 +1029,57 @@
   :config
   (lsp-enable-which-key-integration t))
 
-(setq ispell-program-name "aspell")
-(setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_GB"))
-(setq spell-fu-directory "~/+STORE/dictionary") ;; Please create this directory manually.
-(setq ispell-personal-dictionary "~/+STORE/dictionary/.pws")
-(setq ispell-dictionary "en")
+(use-package! password-store)
 
-;; PLATFORM IO
-;;
-
-(require 'platformio-mode)
-
-;; Enable ccls for all c++ files, and platformio-mode only
-;; when needed (platformio.ini present in project root).
-(add-hook 'c++-mode-hook (lambda ()
-                           (lsp-deferred)
-                           (platformio-conditionally-enable)))
-
-(projectile-mode +1)
-;; Recommended keymap prefix on macOS
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-;; Recommended keymap prefix on Windows/Linux
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-
+(map! :leader
+      :desc "Switch to perspective NAME"       "DEL" #'persp-switch
+      :desc "Switch to buffer in perspective"  "," #'persp-switch-to-buffer
+      :desc "Switch to next perspective"       "]" #'persp-next
+      :desc "Switch to previous perspective"   "[" #'persp-prev
+      :desc "Add a buffer current perspective" "+" #'persp-add-buffer
+      :desc "Remove perspective by name"       "-" #'persp-remove-by-name)
 
 (add-hook 'pdf-view-mode (lambda () (pdf-view-themed-minor-mode -1)))
 
 (add-hook 'pdf-view-mode (lambda () (pdf-view-dark-minor-mode -1)))
 
-(add-hook 'pdf-view (lambda () (pdf-view-themed-minor-mode -1)))
+(define-globalized-minor-mode global-rainbow-mode rainbow-mode
+  (lambda ()
+    (when (not (memq major-mode
+                (list 'org-agenda-mode)))
+     (rainbow-mode 1))))
+(global-rainbow-mode 1 )
 
-(add-hook 'pdf-view (lambda () (pdf-view-dark-minor-mode -1)))
+(map! :leader
+      (:prefix ("r" . "registers")
+       :desc "Copy to register" "c" #'copy-to-register
+       :desc "Frameset to register" "f" #'frameset-to-register
+       :desc "Insert contents of register" "i" #'insert-register
+       :desc "Jump to register" "j" #'jump-to-register
+       :desc "List registers" "l" #'list-registers
+       :desc "Number to register" "n" #'number-to-register
+       :desc "Interactively choose a register" "r" #'counsel-register
+       :desc "View a register" "v" #'view-register
+       :desc "Window configuration to register" "w" #'window-configuration-to-register
+       :desc "Increment register" "+" #'increment-register
+       :desc "Point to register" "SPC" #'point-to-register))
 
+(setq shell-file-name "/bin/fish"
+      vterm-max-scrollback 5000)
+(setq eshell-rc-script "~/.config/doom/eshell/profile"
+      eshell-aliases-file "~/.config/doom/eshell/aliases"
+      eshell-history-size 5000
+      eshell-buffer-maximum-lines 5000
+      eshell-hist-ignoredups t
+      eshell-scroll-to-bottom-on-input t
+      eshell-destroy-buffer-when-process-dies t
+      eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+(map! :leader
+      :desc "Eshell"                 "e s" #'eshell
+      :desc "Eshell popup toggle"    "e t" #'+eshell/toggle
+      :desc "Counsel eshell history" "e h" #'counsel-esh-history
+      :desc "Vterm popup toggle"     "v t" #'+vterm/toggle)
 
-(setq pdf-view-midnight-colors '("#FFFFFF" . "#000000"))
-
-
-  (use-package platformio-mode)
-  ;; edit ino files with adruino mode.
-  (add-to-list 'auto-mode-alist '("\\.ino$" . arduino-mode))
-  ;; Enable irony for all c++ files, and platformio-mode only
-  ;; when needed (platformio.ini present in project root).
-  (add-hook 'c++-mode-hook (lambda ()
-                             (irony-mode)
-                             (irony-eldoc)
-                             (platformio-conditionally-enable)))
-
-  ;; Use irony's completion functions.
-  (add-hook 'irony-mode-hook
-            (lambda ()
-              (define-key irony-mode-map [remap completion-at-point]
-                'irony-completion-at-point-async)
-
-              (define-key irony-mode-map [remap complete-symbol]
-                'irony-completion-at-point-async)
-
-              (irony-cdb-autosetup-compile-options)))
-
-
-;; VTERM TOGGLE
 (use-package vterm-toggle
   :after vterm
   :config
@@ -1260,19 +1295,6 @@
     "w L" '(buf-move-right :wk "Buffer move right"))
 )
 
-
-;; Runtime performance
-(setq gc-cons-threshold (* 2 1000 1000))
-
-;; MOUSE SCROLLING
-(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
-(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
-(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-
-
-;; spell check
-
 (use-package flyspell)
 (use-package flycheck-aspell)
 (dolist (hook '(text-mode-hook))
@@ -1358,8 +1380,6 @@
   (add-to-list 'ispell-skip-region-alist '("\\$" . "\\$"))
   (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")))
-
-;;;;;;;;;;;;;;;;;;;;;;;; LATEX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package pdf-tools
   :ensure t
@@ -1472,5 +1492,36 @@
                         (lsp-deferred)))
   :custom (lsp-latex-build-on-save t))
 
+(defun prefer-horizontal-split ()
+  (set-variable 'split-height-threshold nil t)
+  (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
+(add-hook 'markdown-mode-hook 'prefer-horizontal-split)
+(map! :leader
+      :desc "Clone indirect buffer other window" "b c" #'clone-indirect-buffer-other-window)
 
-;;;;;;;;;;;;;;;;;;;;;;;; LATEX ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq initial-buffer-choice "~/.config/doom/start.org")
+
+(define-minor-mode start-mode
+  "Provide functions for custom start page."
+  :lighter " start"
+  :keymap (let ((map (make-sparse-keymap)))
+          ;;(define-key map (kbd "M-z") 'eshell)
+            (evil-define-key 'normal start-mode-map
+              (kbd "1") '(lambda () (interactive) (find-file "~/.config/doom/config.org"))
+              (kbd "2") '(lambda () (interactive) (find-file "~/.config/doom/init.el"))
+              (kbd "3") '(lambda () (interactive) (find-file "~/.config/doom/packages.el"))
+              (kbd "4") '(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
+              (kbd "5") '(lambda () (interactive) (find-file "~/.config/doom/eshell/profile")))
+          map))
+
+(add-hook 'start-mode-hook 'read-only-mode) ;; make start.org read-only; use 'SPC t r' to toggle off read-only.
+(provide 'start-mode)
+
+(map! :leader
+      (:prefix ("w" . "window")
+       :desc "Winner redo" "<right>" #'winner-redo
+       :desc "Winner undo" "<left>"  #'winner-undo))
+
+(map! :leader
+      :desc "Zap to char"    "z" #'zap-to-char
+      :desc "Zap up to char" "Z" #'zap-up-to-char)
