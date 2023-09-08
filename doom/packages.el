@@ -94,3 +94,5 @@
 (package! async)
 (package! json)
 (package! seq)
+(package! dap-mode)
+(package! exec-path-from-shell)
