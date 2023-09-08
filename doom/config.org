@@ -1,6 +1,6 @@
-#+TITLE: DT's Doom Emacs Config
-#+AUTHOR: Derek Taylor (DT)
-#+DESCRIPTION: DT's personal Doom Emacs config.
+#+TITLE: Akash Doom Emacs Config
+#+AUTHOR: Akash Gopinath (AG)
+#+DESCRIPTION: AG's personal Doom Emacs config.
 #+STARTUP: showeverything
 
 * TABLE OF CONTENTS :toc:
