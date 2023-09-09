@@ -1485,7 +1485,6 @@ We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting
 ** Miscellaneous Org Mode stuff
 
 #+begin_src emacs-lisp
-(setq org-latex-create-formula-image-program 'imagemagick)
 (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 #+end_src
 
