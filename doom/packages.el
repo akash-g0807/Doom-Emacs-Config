@@ -96,3 +96,5 @@
 (package! seq)
 (package! dap-mode)
 (package! exec-path-from-shell)
+(package! git-gutter)
+(package! git-gutter-fringe)

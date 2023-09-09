@@ -4,7 +4,14 @@
                                     (setq-local process-connection-type 'pipe)
                                     (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "-f" "-n"))
                                     (process-send-string wl-copy-p text)
-                                    (process-send-eof wl-copy-p))
+
+
+
+
+
+
+
+                        (process-send-eof wl-copy-p))
         interprogram-paste-function (lambda ()
                                       (unless (and wl-copy-p (process-live-p wl-copy-p))
                                         (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
@@ -1572,14 +1579,3 @@
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
     (dap-auto-configure-mode +1))
-
-(use-package git-gutter
-  :hook (prog-mode . git-gutter-mode)
-  :config
-  (setq git-gutter:update-interval 0.02))
-
-(use-package git-gutter-fringe
-  :config
-  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
-  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))

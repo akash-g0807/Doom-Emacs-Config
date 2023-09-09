@@ -69,6 +69,7 @@
 - [[#winner-mode][WINNER MODE]]
 - [[#zap-to-char][ZAP TO CHAR]]
 - [[#rust-dap][RUST DAP]]
+- [[#git-gutter][GIT GUTTER]]
 
 * ABOUT THIS CONFIG
 This is my personal Doom Emacs config.  Doom Emacs is a distribution of Emacs that uses the "evil" keybindings (Vim keybindings) and includes a number of nice extensions and a bit of configuration out of the box.  I am maintaining this config not just for myself, but also for those that want to explore some of what is possible with Emacs.  I will add a lot of examples of plugins and settings, some of them I may not even use personally.
@@ -2168,4 +2169,20 @@ Rust Debugger
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
     (dap-auto-configure-mode +1))
+#+end_src
+
+* GIT GUTTER
+Git gutter indicators that show added/deleted/modified code blocks that haven’t been committed by git
+
+#+begin_src emacs-lisp
+ (use-package git-gutter
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (setq git-gutter:update-interval 0.02))
+
+(use-package git-gutter-fringe
+  :config
+  (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
+  (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
 #+end_src
