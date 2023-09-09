@@ -1008,6 +1008,7 @@
        :desc "Toggle roam buffer"  "r" #'org-roam-buffer-toggle))
 
 (setq org-latex-create-formula-image-program 'imagemagick)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
