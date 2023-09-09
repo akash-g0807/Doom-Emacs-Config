@@ -1544,6 +1544,7 @@
          :request "launch"
          :name "LLDB::Run"
 	 :gdbpath "rust-lldb"
+         :lldbmipath "~/usr/bin/lldb-mi"
          :target nil
          :cwd nil)))
 
