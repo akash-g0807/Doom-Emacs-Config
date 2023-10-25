@@ -599,9 +599,9 @@ Settings related to fonts within Doom Emacs:
 + 'font-lock-keyword-face' -- for keywords with special significance like 'setq' in elisp.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-font (font-spec :family "JetBrains Mono" :size 26)
-      doom-variable-pitch-font (font-spec :family "Cantarell" :size 34)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 44))
+(setq doom-font (font-spec :family "JetBrains Mono" :size 28)
+      doom-variable-pitch-font (font-spec :family "Cantarell" :size 36)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 46))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
