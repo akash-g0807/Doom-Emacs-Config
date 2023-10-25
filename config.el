@@ -1,123 +1,37 @@
-#+TITLE: Akash Doom Emacs Config
-#+AUTHOR: Akash Gopinath (AG)
-#+DESCRIPTION: AG's personal Doom Emacs config.
-#+STARTUP: showeverything
+;; (when (getenv "WAYLAND_DISPLAY")
+;;   (setq wl-copy-p nil
+;;         interprogram-cut-function (lambda (text)
+;;                                     (setq-local process-connection-type 'pipe)
+;;                                     (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "-f" "-n"))
+;;                                     (process-send-string wl-copy-p text)
+;;                                     (process-send-eof wl-copy-p))
+;;         interprogram-paste-function (lambda ()
+;;                                       (unless (and wl-copy-p (process-live-p wl-copy-p))
+;;                                         (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
 
-* TABLE OF CONTENTS :toc:
-- [[#about-this-config][ABOUT THIS CONFIG]]
-- [[#wayland-integration][WAYLAND INTEGRATION]]
-- [[#beacon][BEACON]]
-- [[#cache][CACHE]]
-- [[#bookmarks-and-buffers][BOOKMARKS AND BUFFERS]]
-  - [[#bookmarks][Bookmarks]]
-  - [[#buffers][Buffers]]
-  - [[#global-auto-revert][Global Auto Revert]]
-  - [[#keybindings-within-ibuffer-mode][Keybindings within ibuffer mode]]
-- [[#calendar][CALENDAR]]
-- [[#centaur-tabs][CENTAUR-TABS]]
-- [[#clippy][CLIPPY]]
-- [[#dired][DIRED]]
-  - [[#keybindings-to-open-dired][Keybindings To Open Dired]]
-  - [[#keybindings-within-dired][Keybindings Within Dired]]
-  - [[#keybindings-within-dired-with-peep-dired-mode-enabled][Keybindings Within Dired With Peep-Dired-Mode Enabled]]
-  - [[#making-deleted-files-go-to-trash-can][Making deleted files go to trash can]]
-- [[#doom-theme][DOOM THEME]]
-- [[#ednc-notifications][EDNC (Notifications)]]
-- [[#elfeed][ELFEED]]
-- [[#emms][EMMS]]
-- [[#emojis][EMOJIS]]
-- [[#erc][ERC]]
-- [[#evaluate-elisp-expressions][EVALUATE ELISP EXPRESSIONS]]
-- [[#eww][EWW]]
-- [[#exwm][EXWM]]
-- [[#fonts][FONTS]]
-- [[#insert-date][INSERT DATE]]
-- [[#ivy][IVY]]
-  - [[#ivy-posframe][IVY-POSFRAME]]
-  - [[#ivy-keybindings][IVY KEYBINDINGS]]
-- [[#line-settings][LINE SETTINGS]]
-- [[#markdown][MARKDOWN]]
-- [[#minimap][MINIMAP]]
-- [[#modeline][MODELINE]]
-- [[#mouse-support][MOUSE SUPPORT]]
-- [[#neotree][NEOTREE]]
-- [[#open-specific-files][OPEN SPECIFIC FILES]]
-- [[#org-mode][ORG MODE]]
-  - [[#org-agenda][Org-agenda]]
-  - [[#org-auto-tangle][Org-auto-tangle]]
-  - [[#org-capture][Org Capture]]
-  - [[#org-fonts][Org fonts]]
-  - [[#org-export][Org-export]]
-  - [[#org-journal][Org-journal]]
-  - [[#org-publish][Org-publish]]
-  - [[#org-roam][Org-roam]]
-  - [[#miscellaneous-org-mode-stuff][Miscellaneous Org Mode stuff]]
-- [[#irony-mode-and-clangd][IRONY MODE AND CLANGD]]
-- [[#ccls][CCLS]]
-- [[#password-store][PASSWORD STORE]]
-- [[#perspective][PERSPECTIVE]]
-- [[#pdf-view-mode][PDF VIEW MODE]]
-- [[#rainbow-mode][RAINBOW MODE]]
-- [[#registers][REGISTERS]]
-- [[#shells][SHELLS]]
-- [[#vterm-toggle][VTERM Toggle]]
-- [[#general-keybinds][GENERAL KEYBINDS]]
-- [[#spellcheck][SPELLCHECK]]
-- [[#latex-configuration][LaTeX CONFIGURATION]]
-- [[#splits][SPLITS]]
-- [[#start-page][START PAGE]]
-- [[#winner-mode][WINNER MODE]]
-- [[#zap-to-char][ZAP TO CHAR]]
-- [[#rust-dap][RUST DAP]]
-- [[#git-gutter][GIT GUTTER]]
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
 
-* ABOUT THIS CONFIG
-This is my personal Doom Emacs config.  Doom Emacs is a distribution of Emacs that uses the "evil" keybindings (Vim keybindings) and includes a number of nice extensions and a bit of configuration out of the box.  I am maintaining this config not just for myself, but also for those that want to explore some of what is possible with Emacs.  I will add a lot of examples of plugins and settings, some of them I may not even use personally.
+(setq dashboard-startup-banner  2)
 
-* WAYLAND INTEGRATION
-To make emacs work with wl-clipboard
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-#+begin_src emacs-lisp
-(when (getenv "WAYLAND_DISPLAY")
-  (setq wl-copy-p nil
-        interprogram-cut-function (lambda (text)
-                                    (setq-local process-connection-type 'pipe)
-                                    (setq wl-copy-p (start-process "wl-copy" nil "wl-copy" "-f" "-n"))
-                                    (process-send-string wl-copy-p text)
-                                    (process-send-eof wl-copy-p))
-        interprogram-paste-function (lambda ()
-                                      (unless (and wl-copy-p (process-live-p wl-copy-p))
-                                        (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
-#+end_src
+(setq dashboard-items '((recents  . 5)
+                        (bookmarks . 5)
+                        (projects . 5)
+                        (agenda . 5)
+                        (registers . 5)))
 
-* BEACON
-Never lose your cursor.  When you scroll, your cursor will shine!  This is a global minor-mode. Turn it on everywhere with:
+(setq dashboard-center-content t)
 
-#+begin_src emacs-lisp
-(beacon-mode 1)
-#+end_src
+(setq doom-fallback-buffer "*dashboard*")
 
-* CACHE
-To fix caching errors
+;;(beacon-mode 1)
 
-#+begin_src emacs-lisp
 (setq-default cache-long-scans nil)
-#+end_src
 
-* BOOKMARKS AND BUFFERS
-Doom Emacs uses 'SPC b' for keybindings related to bookmarks and buffers.
-
-** Bookmarks
-Bookmarks are somewhat like registers in that they record positions you can jump to.  Unlike registers, they have long names, and they persist automatically from one Emacs session to the next. The prototypical use of bookmarks is to record where you were reading in various files.
-
-| COMMAND         | DESCRIPTION                            | KEYBINDING |
-|-----------------+----------------------------------------+------------|
-| list-bookmarks  | /List bookmarks/                         | SPC b L    |
-| bookmark-set    | /Set bookmark/                           | SPC b m    |
-| bookmark-delete | /Delete bookmark/                        | SPC b M    |
-| bookmark-save   | /Save current bookmark to bookmark file/ | SPC b w    |
-
-#+BEGIN_SRC emacs-lisp
 (setq bookmark-default-file "~/.config/doom/bookmarks")
 
 (map! :leader
@@ -126,43 +40,10 @@ Bookmarks are somewhat like registers in that they record positions you can jump
        :desc "Set bookmark"                            "m" #'bookmark-set
        :desc "Delete bookmark"                         "M" #'bookmark-set
        :desc "Save current bookmarks to bookmark file" "w" #'bookmark-save))
-#+END_SRC
 
-** Buffers
-Regarding /buffers/, the text you are editing in Emacs resides in an object called a /buffer/. Each time you visit a file, a buffer is used to hold the file’s text. Each time you invoke Dired, a buffer is used to hold the directory listing.  /Ibuffer/ is a program that lists all of your Emacs /buffers/, allowing you to navigate between them and filter them.
-
-| COMMAND         | DESCRIPTION          | KEYBINDING |
-|-----------------+----------------------+------------|
-| ibuffer         | /Launch ibuffer/       | SPC b i    |
-| kill-buffer     | /Kill current buffer/  | SPC b k    |
-| next-buffer     | /Goto next buffer/     | SPC b n    |
-| previous-buffer | /Goto previous buffer/ | SPC b p    |
-| save-buffer     | /Save current buffer/  | SPC b s    |
-
-** Global Auto Revert
-A buffer can get out of sync with respect to its visited file on disk if that file is changed by another program. To keep it up to date, you can enable Auto Revert mode by typing M-x auto-revert-mode, or you can set it to be turned on globally with 'global-auto-revert-mode'.  I have also turned on Global Auto Revert on non-file buffers, which is especially useful for 'dired' buffers.
-
-#+begin_src emacs-lisp
 (global-auto-revert-mode 1)
 (setq global-auto-revert-non-file-buffers t)
-#+end_src
 
-** Keybindings within ibuffer mode
-| COMMAND                           | DESCRIPTION                            | KEYBINDING |
-|-----------------------------------+----------------------------------------+------------|
-| ibuffer-mark-forward              | /Mark the buffer/                        | m          |
-| ibuffer-unmark-forward            | /Unmark the buffer/                      | u          |
-| ibuffer-do-kill-on-deletion-marks | /Kill the marked buffers/                | x          |
-| ibuffer-filter-by-content         | /Ibuffer filter by content/              | f c        |
-| ibuffer-filter-by-directory       | /Ibuffer filter by directory/            | f d        |
-| ibuffer-filter-by-filename        | /Ibuffer filter by filename (full path)/ | f f        |
-| ibuffer-filter-by-mode            | /Ibuffer filter by mode/                 | f m        |
-| ibuffer-filter-by-name            | /Ibuffer filter by name/                 | f n        |
-| ibuffer-filter-disable            | /Disable ibuffer filter/                 | f x        |
-| ibuffer-do-kill-lines             | /Hide marked buffers/                    | g h        |
-| ibuffer-update                    | /Restore hidden buffers/                 | g H        |
-
-#+begin_src emacs-lisp
 (evil-define-key 'normal ibuffer-mode-map
   (kbd "f c") 'ibuffer-filter-by-content
   (kbd "f d") 'ibuffer-filter-by-directory
@@ -172,15 +53,7 @@ A buffer can get out of sync with respect to its visited file on disk if that fi
   (kbd "f x") 'ibuffer-filter-disable
   (kbd "g h") 'ibuffer-do-kill-lines
   (kbd "g H") 'ibuffer-update)
-#+end_src
 
-* CALENDAR
-Let's make a 12-month calendar available so we can have a calendar app that, when we click on time/date in xmobar, we get a nice 12-month calendar to view.
-
-This is a modification of: http://homepage3.nifty.com/oatu/emacs/calendar.html
-See also: https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-than-3-months
-
-#+begin_src emacs-lisp
 ;; https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-than-3-months
 (defun dt/year-calendar (&optional year)
   (interactive)
@@ -239,27 +112,10 @@ See also: https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-t
       :desc "Scroll year calendar forward" "<right>" #'dt/scroll-year-calendar-forward)
 
 (defalias 'year-calendar 'dt/year-calendar)
-#+end_src
 
-Let's also play around with calfw.
-#+begin_src emacs-lisp
 (use-package! calfw)
 (use-package! calfw-org)
-#+end_src
 
-* CENTAUR-TABS
-To use tabs in Doom Emacs, be sure to uncomment "tabs" in Doom's init.el.  Displays tabs at the top of the window similar to tabbed web browsers such as Firefox.  I don't actually use tabs in Emacs.  I placed this in my config to help others who may want tabs.  In the default configuration of Doom Emacs, 'SPC t' is used for "toggle" keybindings, so I choose 'SPC t c' to toggle centaur-tabs.  The "g" prefix for keybindings is used for a bunch of evil keybindings in Doom, but "g" plus the arrow keys were not used, so I thought I would bind those for tab navigation.  But I did leave the default "g t" and "g T" intact if you prefer to use those for centaur-tabs-forward/backward.
-
-| COMMAND                     | DESCRIPTION               | KEYBINDING       |
-|-----------------------------+---------------------------+------------------|
-| centaur-tabs-mode           | /Toggle tabs globally/      | SPC t c          |
-| centaur-tabs-local-mode     | /Toggle tabs local display/ | SPC t C          |
-| centaur-tabs-forward        | /Next tab/                  | g <right> or g t |
-| centaur-tabs-backward       | /Previous tab/              | g <left> or g T  |
-| centaur-tabs-forward-group  | /Next tab group/            | g <down>         |
-| centaur-tabs-backward-group | /Previous tab group/        | g <up>           |
-
-#+BEGIN_SRC emacs-lisp
 (setq centaur-tabs-set-bar 'over
       centaur-tabs-set-icons t
       centaur-tabs-gray-out-icons 'buffer
@@ -274,73 +130,92 @@ To use tabs in Doom Emacs, be sure to uncomment "tabs" in Doom's init.el.  Displ
                                                (kbd "g <left>")  'centaur-tabs-backward       ; default Doom binding is 'g T'
                                                (kbd "g <down>")  'centaur-tabs-forward-group
                                                (kbd "g <up>")    'centaur-tabs-backward-group)
-#+END_SRC
 
-* CLIPPY
-Gives us a popup box with "Clippy, the paper clip". You can make him say various things by calling 'clippy-say' function.  But the more useful functions of clippy are the two describe functions provided: 'clippy-describe-function' and 'clippy-describe-variable'.  Hit the appropriate keybinding while the point is over a function/variable to call it.  A popup with helpful clippy will appear, telling you about the function/variable (using describe-function and describe-variable respectively).
+(use-package centaur-tabs
+  :init
+  (setq centaur-tabs-enable-key-bindings t)
+  :config
+  (setq ;; centaur-tabs-style "bar"
+        ;; centaur-tabs-height 32
+        ;; centaur-tabs-set-icons t
+        centaur-tabs-show-new-tab-button t
+        ;; centaur-tabs-set-modified-marker t
+        centaur-tabs-show-navigation-buttons t
+        ;; centaur-tabs-set-bar 'under
+        ;; centaur-tabs-show-count nil
+        centaur-tabs-label-fixed-length 15
+        ;; centaur-tabs-gray-out-icons 'buffer
+        ;; centaur-tabs-plain-icons t
+        ;; x-underline-at-descent-line t
+        ;; centaur-tabs-left-edge-margin nil
+        )
+  (centaur-tabs-change-fonts (face-attribute 'default :font) 110)
+  (centaur-tabs-headline-match)
+  ;; (centaur-tabs-enable-buffer-alphabetical-reordering)
+  ;; (setq centaur-tabs-adjust-buffer-order t)
+  (centaur-tabs-mode t)
+  (setq uniquify-separator "/")
+  (setq uniquify-buffer-name-style 'forward)
+  (defun centaur-tabs-buffer-groups ()
+    "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-| COMMAND                  | DESCRIPTION                           | KEYBINDING |
-|--------------------------+---------------------------------------+------------|
-| clippy-describe-function | /Clippy describes function under point/ | SPC c h f  |
-| clippy-describe-variable | /Clippy describes variable under point/ | SPC c h v  |
+Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+All buffer name start with * will group to \"Emacs\".
+Other buffer group by `centaur-tabs-get-group-name' with project name."
+    (list
+     (cond
+      ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+      ;; "Remote")
+      ((or (string-equal "*" (substring (buffer-name) 0 1))
+           (memq major-mode '(magit-process-mode
+                              magit-status-mode
+                              magit-diff-mode
+                              magit-log-mode
+                              magit-file-mode
+                              magit-blob-mode
+                              magit-blame-mode
+                              )))
+       "Emacs")
+      ((derived-mode-p 'prog-mode)
+       "Editing")
+      ((derived-mode-p 'dired-mode)
+       "Dired")
+      ((memq major-mode '(helpful-mode
+                          help-mode))
+       "Help")
+      ((memq major-mode '(org-mode
+                          org-agenda-clockreport-mode
+                          org-src-mode
+                          org-agenda-mode
+                          org-beamer-mode
+                          org-indent-mode
+                          org-bullets-mode
+                          org-cdlatex-mode
+                          org-agenda-log-mode
+                          diary-mode))
+       "OrgMode")
+      (t
+       (centaur-tabs-get-group-name (current-buffer))))))
+  :hook
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  :bind
+  ("C-<prior>" . centaur-tabs-backward)
+  ("C-<next>" . centaur-tabs-forward)
+  ("C-S-<prior>" . centaur-tabs-move-current-tab-to-left)
+  ("C-S-<next>" . centaur-tabs-move-current-tab-to-right)
+  ; (:map evil-normal-state-map
+  ; ("g t" . centaur-tabs-forward)
+  ; ("g T" . centaur-tabs-backward))
+ )
 
-#+begin_src emacs-lisp
 (map! :leader
       (:prefix ("c h" . "Help info from Clippy")
        :desc "Clippy describes function under point" "f" #'clippy-describe-function
        :desc "Clippy describes variable under point" "v" #'clippy-describe-variable))
 
-#+end_src
-
-* DIRED
-Dired is the file manager within Emacs.  Below, I setup keybindings for image previews (peep-dired).  Doom Emacs does not use 'SPC d' for any of its keybindings, so I've chosen the format of 'SPC d' plus 'key'.
-
-** Keybindings To Open Dired
-
-| COMMAND    | DESCRIPTION                        | KEYBINDING |
-|------------+------------------------------------+------------|
-| dired      | /Open dired file manager/            | SPC d d    |
-| dired-jump | /Jump to current directory in dired/ | SPC d j    |
-
-** Keybindings Within Dired
-*** Basic dired commands
-
-| COMMAND                | DESCRIPTION                                 | KEYBINDING |
-|------------------------+---------------------------------------------+------------|
-| dired-view-file        | /View file in dired/                          | SPC d v    |
-| dired-up-directory     | /Go up in directory tree/                     | h          |
-| dired-find-file        | /Go down in directory tree (or open if file)/ | l          |
-| dired-next-line        | /Move down to next line/                      | j          |
-| dired-previous-line    | /Move up to previous line/                    | k          |
-| dired-mark             | /Mark file at point/                          | m          |
-| dired-unmark           | /Unmark file at point/                        | u          |
-| dired-do-copy          | /Copy current file or marked files/           | C          |
-| dired-do-rename        | /Rename current file or marked files/         | R          |
-| dired-hide-details     | /Toggle detailed listings on/off/             | (          |
-| dired-git-info-mode    | /Toggle git information on/off/               | )          |
-| dired-create-directory | /Create new empty directory/                  | +          |
-| dired-diff             | /Compare file at point with another/          | =          |
-| dired-subtree-toggle   | /Toggle viewing subtree at point/             | TAB        |
-
-*** Dired commands using regex
-
-| COMMAND                 | DESCRIPTION                | KEYBINDING |
-|-------------------------+----------------------------+------------|
-| dired-mark-files-regexp | /Mark files using regex/     | % m        |
-| dired-do-copy-regexp    | /Copy files using regex/     | % C        |
-| dired-do-rename-regexp  | /Rename files using regex/   | % R        |
-| dired-mark-files-regexp | /Mark all files using regex/ | * %        |
-
-*** File permissions and ownership
-
-| COMMAND         | DESCRIPTION                      | KEYBINDING |
-|-----------------+----------------------------------+------------|
-| dired-do-chgrp  | /Change the group of marked files/ | g G        |
-| dired-do-chmod  | /Change the mode of marked files/  | M          |
-| dired-do-chown  | /Change the owner of marked files/ | O          |
-| dired-do-rename | /Rename file or all marked files/  | R          |
-
-#+begin_src emacs-lisp
 (map! :leader
       (:prefix ("d" . "dired")
        :desc "Open dired" "d" #'dired
@@ -378,7 +253,7 @@ Dired is the file manager within Emacs.  Below, I setup keybindings for image pr
   (kbd "; d") 'epa-dired-do-decrypt
   (kbd "; e") 'epa-dired-do-encrypt)
 ;; Get file icons in dired
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;; (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
 ;; With dired-open plugin, you can launch external programs for certain extensions
 ;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
 (setq dired-open-extensions '(("gif" . "sxiv")
@@ -386,51 +261,20 @@ Dired is the file manager within Emacs.  Below, I setup keybindings for image pr
                               ("png" . "sxiv")
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
-#+end_src
 
-** Keybindings Within Dired With Peep-Dired-Mode Enabled
-If peep-dired is enabled, you will get image previews as you go up/down with 'j' and 'k'
-
-| COMMAND              | DESCRIPTION                              | KEYBINDING |
-|----------------------+------------------------------------------+------------|
-| peep-dired           | /Toggle previews within dired/             | SPC d p    |
-| peep-dired-next-file | /Move to next file in peep-dired-mode/     | j          |
-| peep-dired-prev-file | /Move to previous file in peep-dired-mode/ | k          |
-
-#+BEGIN_SRC emacs-lisp
 (evil-define-key 'normal peep-dired-mode-map
   (kbd "j") 'peep-dired-next-file
   (kbd "k") 'peep-dired-prev-file)
 (add-hook 'peep-dired-hook 'evil-normalize-keymaps)
-#+END_SRC
 
-** Making deleted files go to trash can
-#+begin_src emacs-lisp
 (setq delete-by-moving-to-trash t
       trash-directory "~/.local/share/Trash/files/")
-#+end_src
 
-=NOTE=: For convenience, you may want to create a symlink to 'local/share/Trash' in your home directory:
-#+begin_example
-cd ~/
-ln -s ~/.local/share/Trash .
-#+end_example
-
-* DOOM THEME
-Setting the theme to doom-one.  To try out new themes, I set a keybinding for counsel-load-theme with 'SPC h t'.
-
-#+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-palenight)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
-#+END_SRC
+(setq load-theme 'doom-palenight)
 
-* EDNC (Notifications)
-The Emacs Desktop Notification Center (EDNC) is an Emacs package written in pure Lisp that implements a desktop notifications service according to the freedesktop.org specification. EDNC aspires to be a small, but flexible drop-in replacement of standalone daemons like dunst.
-
-=NOTE=: Ensure that no other notification daemon (such as dunst) is active to use EDNC.
-
-#+begin_src emacs-lisp
 (ednc-mode 1)
 
 (defun show-notification-in-buffer (old new)
@@ -449,115 +293,10 @@ The Emacs Desktop Notification Center (EDNC) is an Emacs package written in pure
   (kbd "d")   'ednc-dismiss-notification
   (kbd "RET") 'ednc-invoke-action
   (kbd "e")   'ednc-toggle-expanded-view)
-#+end_src
 
-* ELFEED
-An RSS newsfeed reader for Emacs.
-
-#+BEGIN_SRC emacs-lisp
-(setq elfeed-goodies/entry-pane-size 0.5)
-
-(evil-define-key 'normal elfeed-show-mode-map
-  (kbd "J") 'elfeed-goodies/split-show-next
-  (kbd "K") 'elfeed-goodies/split-show-prev)
-(evil-define-key 'normal elfeed-search-mode-map
-  (kbd "J") 'elfeed-goodies/split-show-next
-  (kbd "K") 'elfeed-goodies/split-show-prev)
-(setq elfeed-feeds (quote
-                    (("https://www.reddit.com/r/linux.rss" reddit linux)
-                     ("https://www.reddit.com/r/commandline.rss" reddit commandline)
-                     ("https://www.reddit.com/r/distrotube.rss" reddit distrotube)
-                     ("https://www.reddit.com/r/emacs.rss" reddit emacs)
-                     ("https://www.gamingonlinux.com/article_rss.php" gaming linux)
-                     ("https://hackaday.com/blog/feed/" hackaday linux)
-                     ("https://opensource.com/feed" opensource linux)
-                     ("https://linux.softpedia.com/backend.xml" softpedia linux)
-                     ("https://itsfoss.com/feed/" itsfoss linux)
-                     ("https://www.zdnet.com/topic/linux/rss.xml" zdnet linux)
-                     ("https://www.phoronix.com/rss.php" phoronix linux)
-                     ("http://feeds.feedburner.com/d0od" omgubuntu linux)
-                     ("https://www.computerworld.com/index.rss" computerworld linux)
-                     ("https://www.networkworld.com/category/linux/index.rss" networkworld linux)
-                     ("https://www.techrepublic.com/rssfeeds/topic/open-source/" techrepublic linux)
-                     ("https://betanews.com/feed" betanews linux)
-                     ("http://lxer.com/module/newswire/headlines.rss" lxer linux))))
-#+END_SRC
-
-* EMMS
-One of the media players available for Emacs is emms, which stands for Emacs Multimedia System.  By default, Doom Emacs does not use 'SPC a',' so the format I use for these bindings is 'SPC a' plus 'key'.
-
-| COMMAND               | DESCRIPTION                       | KEYBINDING |
-|-----------------------+-----------------------------------+------------|
-| emms-playlist-mode-go | /Switch to the playlist buffer/     | SPC a a    |
-| emms-pause            | /Pause the track/                   | SPC a x    |
-| emms-stop             | /Stop the track/                    | SPC a s    |
-| emms-previous         | /Play previous track in playlist/   | SPC a p    |
-| emms-next             | /Play next track in playlist/       | SPC a n    |
-
-#+BEGIN_SRC emacs-lisp
-(emms-all)
-(emms-default-players)
-(emms-mode-line 1)
-(emms-playing-time 1)
-(setq emms-source-file-default-directory "~/Music/"
-      emms-playlist-buffer-name "*Music*"
-      emms-info-asynchronously t
-      emms-source-file-directory-tree-function 'emms-source-file-directory-tree-find)
-(map! :leader
-      (:prefix ("a" . "EMMS audio player")
-       :desc "Go to emms playlist"      "a" #'emms-playlist-mode-go
-       :desc "Emms pause track"         "x" #'emms-pause
-       :desc "Emms stop track"          "s" #'emms-stop
-       :desc "Emms play previous track" "p" #'emms-previous
-       :desc "Emms play next track"     "n" #'emms-next))
-#+END_SRC
-
-* EMOJIS
-Emojify is an Emacs extension to display emojis. It can display github style emojis like :smile: or plain ascii ones like :).
-
-#+begin_src emacs-lisp
 (use-package emojify
   :hook (after-init . global-emojify-mode))
-#+end_src
 
-* ERC
-ERC is a built-in Emacs IRC client.
-
-| COMMAND | DESCRIPTION                                 | KEYBINDING |
-|---------+---------------------------------------------+------------|
-| erc-tls | /Launch ERC using more secure TLS connection/ | SPC e E    |
-
-#+begin_src emacs-lisp
-(map! :leader
-      (:prefix ("e". "evaluate/ERC/EWW")
-       :desc "Launch ERC with TLS connection" "E" #'erc-tls))
-
-(setq erc-prompt (lambda () (concat "[" (buffer-name) "]"))
-      erc-server "irc.libera.chat"
-      erc-nick "distrotube"
-      erc-user-full-name "Derek Taylor"
-      erc-track-shorten-start 24
-      erc-autojoin-channels-alist '(("irc.libera.chat" "#archlinux" "#linux" "#emacs"))
-      erc-kill-buffer-on-part t
-      erc-fill-column 100
-      erc-fill-function 'erc-fill-static
-      erc-fill-static-center 20
-      ;; erc-auto-query 'bury
-      )
-#+end_src
-
-* EVALUATE ELISP EXPRESSIONS
-Changing some keybindings from their defaults to better fit with Doom Emacs, and to avoid conflicts with my window managers which sometimes use the control key in their keybindings.  By default, Doom Emacs does not use 'SPC e' for anything, so I choose to use the format 'SPC e' plus 'key' for these (I also use 'SPC e' for 'eww' keybindings).
-
-| COMMAND         | DESCRIPTION                                  | KEYBINDING |
-|-----------------+----------------------------------------------+------------|
-| eval-buffer     | /Evaluate elisp in buffer/                     | SPC e b    |
-| eval-defun      | /Evaluate the defun containing or after point/ | SPC e d    |
-| eval-expression | /Evaluate an elisp expression/                 | SPC e e    |
-| eval-last-sexp  | /Evaluate elisp expression before point/       | SPC e l    |
-| eval-region     | /Evaluate elisp in region/                     | SPC e r    |
-
-#+Begin_src emacs-lisp
 (map! :leader
       (:prefix ("e". "evaluate/ERC/EWW")
        :desc "Evaluate elisp in buffer"  "b" #'eval-buffer
@@ -565,57 +304,44 @@ Changing some keybindings from their defaults to better fit with Doom Emacs, and
        :desc "Evaluate elisp expression" "e" #'eval-expression
        :desc "Evaluate last sexpression" "l" #'eval-last-sexp
        :desc "Evaluate elisp in region"  "r" #'eval-region))
-#+END_SRC
 
-* EWW
-EWW is the Emacs Web Wowser, the builtin browser in Emacs.  Below I set urls to open in a specific browser (eww) with browse-url-browser-function.  By default, Doom Emacs does not use 'SPC e' for anything, so I choose to use the format 'SPC e' plus 'key' for these (I also use 'SPC e' for 'eval' keybindings).  I chose to use 'SPC s w' for eww-search-words because Doom Emacs uses 'SPC s' for 'search' commands.
-
-#+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'eww-browse-url)
-(map! :leader
-      :desc "Search web for text between BEG/END"
-      "s w" #'eww-search-words
-      (:prefix ("e" . "evaluate/ERC/EWW")
-       :desc "Eww web browser" "w" #'eww
-       :desc "Eww reload page" "R" #'eww-reload))
-#+END_SRC
-
-* EXWM
-#+begin_src emacs-lisp
-(autoload 'exwm-enable "exwm-config.el")
-#+end_src
-
-* FONTS
-Settings related to fonts within Doom Emacs:
-+ 'doom-font' -- standard monospace font that is used for most things in Emacs.
-+ 'doom-variable-pitch-font' -- variable font which is useful in some Emacs plugins.
-+ 'doom-big-font' -- used in doom-big-font-mode; useful for presentations.
-+ 'font-lock-comment-face' -- for comments.
-+ 'font-lock-keyword-face' -- for keywords with special significance like 'setq' in elisp.
-
-#+BEGIN_SRC emacs-lisp
-(setq doom-font (font-spec :family "JetBrains Mono" :size 30)
-      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 30)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 48))
+(setq doom-font (font-spec :family "JetBrains Mono" :size 13)
+      doom-variable-pitch-font (font-spec :family "Cantarell" :size 17)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 22))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
-#+END_SRC
 
-* INSERT DATE
-Some custom functions to insert the date.  The function 'insert-todays-date' can be used one of three different ways: (1) just the keybinding without the universal argument prefix, (2) with one universal argument prefix, or (3) with two universal argument prefixes.  The universal argument prefix is 'SPC-u' in Doom Emacs (C-u in standard GNU Emacs).  The function 'insert-any-date' only outputs to one format, which is the same format as 'insert-todays-date' without a prefix.
+ ;; Copied from stackoverflow, this retains colors for org src blocks and tables, while making them monospaced
+(defun my-adjoin-to-list-or-symbol (element list-or-symbol)
+  (let ((list (if (not (listp list-or-symbol))
+                  (list list-or-symbol)
+                list-or-symbol)))
+    (require 'cl-lib)
+    (cl-adjoin element list)))
 
-| COMMAND               | EXAMPLE OUTPUT            | KEYBINDING            |
-|-----------------------+---------------------------+-----------------------|
-| dt/insert-todays-date | /Friday, November 19, 2021/ | SPC i d t             |
-| dt/insert-todays-date | /11-19-2021/                | SPC u SPC i d t       |
-| dt/insert-todays-date | /2021-11-19/                | SPC u SPC u SPC i d t |
-| dt/insert-any-date    | /Friday, November 19, 2021/ | SPC i d a             |
+(eval-after-load "org"
+  '(mapc
+    (lambda (face)
+      (set-face-attribute
+       face nil
+       :inherit
+       (my-adjoin-to-list-or-symbol
+        'fixed-pitch
+        (face-attribute face :inherit))))
+    (list 'org-code 'org-block 'org-table 'org-verbatim 'org-checkbox 'line-number-current-line 'line-number 'org-formula 'org-special-keyword 'org-meta-line)))
 
-#+begin_src emacs-lisp
+(set-frame-font "JetBrains Mono 14" nil t)
+(set-face-attribute 'variable-pitch nil :font "Cantarell")
+
+;;(add-hook 'after-make-frame-functions
+;;          (lambda (frame)
+;;            (doom/reload-font)
+;;            ))
+
 (defun dt/insert-todays-date (prefix)
   (interactive "P")
   (let ((format (cond
@@ -634,28 +360,7 @@ Some custom functions to insert the date.  The function 'insert-todays-date' can
       (:prefix ("i d" . "Insert date")
         :desc "Insert any date"    "a" #'dt/insert-any-date
         :desc "Insert todays date" "t" #'dt/insert-todays-date))
-#+end_src
 
-* IVY
-Ivy is a generic completion mechanism for Emacs.
-
-** IVY-POSFRAME
-Ivy-posframe is an ivy extension, which lets ivy use posframe to show its candidate menu.  Some of the settings below involve:
-+ ivy-posframe-display-functions-alist -- sets the display position for specific programs
-+ ivy-posframe-height-alist -- sets the height of the list displayed for specific programs
-
-Available functions (positions) for 'ivy-posframe-display-functions-alist'
-+ ivy-posframe-display-at-frame-center
-+ ivy-posframe-display-at-window-center
-+ ivy-posframe-display-at-frame-bottom-left
-+ ivy-posframe-display-at-window-bottom-left
-+ ivy-posframe-display-at-frame-bottom-window-center
-+ ivy-posframe-display-at-point
-+ ivy-posframe-display-at-frame-top-center
-
-=NOTE:= If the setting for 'ivy-posframe-display' is set to 'nil' (false), anything that is set to 'ivy-display-function-fallback' will just default to their normal position in Doom Emacs (usually a bottom split).  However, if this is set to 't' (true), then the fallback position will be centered in the window.
-
-#+BEGIN_SRC emacs-lisp
 (setq ivy-posframe-display-functions-alist
       '((swiper                     . ivy-posframe-display-at-point)
         (complete-symbol            . ivy-posframe-display-at-point)
@@ -673,30 +378,12 @@ Available functions (positions) for 'ivy-posframe-display-functions-alist'
         (dmenu . 20)
         (t . 10)))
 (ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
-#+END_SRC
 
-** IVY KEYBINDINGS
-By default, Doom Emacs does not use 'SPC v', so the format I use for these bindings is 'SPC v' plus 'key'.
-
-#+BEGIN_SRC emacs-lisp
 (map! :leader
       (:prefix ("v" . "Ivy")
        :desc "Ivy push view" "v p" #'ivy-push-view
        :desc "Ivy switch view" "v s" #'ivy-switch-view))
-#+END_SRC
 
-* LINE SETTINGS
-I set comment-line to 'SPC TAB TAB' which is a rather comfortable keybinding for me on my ZSA Moonlander keyboard.  The standard Emacs keybinding for comment-line is 'C-x C-;'.  The other keybindings are for commands that toggle on/off various line-related settings.  Doom Emacs uses 'SPC t' for "toggle" commands, so I choose 'SPC t' plus 'key' for those bindings.
-
-| COMMAND                  | DESCRIPTION                               | KEYBINDING  |
-|--------------------------+-------------------------------------------+-------------|
-| comment-line             | /Comment or uncomment lines/                | SPC TAB TAB |
-| hl-line-mode             | /Toggle line highlighting in current frame/ | SPC t h     |
-| global-hl-line-mode      | /Toggle line highlighting globally/         | SPC t H     |
-| doom/toggle-line-numbers | /Toggle line numbers/                       | SPC t l     |
-| toggle-truncate-lines    | /Toggle truncate lines/                     | SPC t t     |
-
-#+BEGIN_SRC emacs-lisp
 (setq display-line-numbers-type t)
 (map! :leader
       :desc "Comment or uncomment lines"      "TAB TAB" #'comment-line
@@ -705,11 +392,7 @@ I set comment-line to 'SPC TAB TAB' which is a rather comfortable keybinding for
        :desc "Toggle line highlight in frame" "h" #'hl-line-mode
        :desc "Toggle line highlight globally" "H" #'global-hl-line-mode
        :desc "Toggle truncate lines"          "t" #'toggle-truncate-lines))
-#+END_SRC
 
-* MARKDOWN
-
-#+begin_src emacs-lisp
 (custom-set-faces
  '(markdown-header-face ((t (:inherit font-lock-function-name-face :weight bold :family "variable-pitch"))))
  '(markdown-header-face-1 ((t (:inherit markdown-header-face :height 1.7))))
@@ -719,76 +402,29 @@ I set comment-line to 'SPC TAB TAB' which is a rather comfortable keybinding for
  '(markdown-header-face-5 ((t (:inherit markdown-header-face :height 1.3))))
  '(markdown-header-face-6 ((t (:inherit markdown-header-face :height 1.2)))))
 
-#+end_src
-
-* MINIMAP
-A minimap sidebar displaying a smaller version of the current buffer on either the left or right side. It highlights the currently shown region and updates its position automatically.  Be aware that this minimap program does not work in Org documents.  This is not unusual though because I have tried several minimap programs and none of them can handle Org.
-
-| COMMAND      | DESCRIPTION                               | KEYBINDING |
-|--------------+-------------------------------------------+------------|
-| minimap-mode | /Toggle minimap-mode/                       | SPC t m    |
-
-#+begin_src emacs-lisp
 (setq minimap-window-location 'right)
 (map! :leader
       (:prefix ("t" . "toggle")
        :desc "Toggle minimap-mode" "m" #'minimap-mode))
-#+end_src
 
-* MODELINE
-The modeline is the bottom status bar that appears in Emacs windows.  For more information on what is available to configure in the Doom modeline, check out:
-https://github.com/seagle0128/doom-modeline
-
-#+begin_src emacs-lisp
 (set-face-attribute 'mode-line nil :font "Ubuntu Mono-13")
 (setq doom-modeline-height 30     ;; sets modeline height
       doom-modeline-bar-width 5   ;; sets right bar width
       doom-modeline-persp-name t  ;; adds perspective name to modeline
       doom-modeline-persp-icon t) ;; adds folder icon next to persp name
-#+end_src
 
-* MOUSE SUPPORT
-Adding mouse support in the terminal version of Emacs.
-
-#+begin_src emacs-lisp
 (xterm-mouse-mode 1)
-#+end_src
 
-* NEOTREE
-Neotree is a file tree viewer.  When you open neotree, it jumps to the current file thanks to neo-smart-open.  The neo-window-fixed-size setting makes the neotree width be adjustable.  Doom Emacs had no keybindings set for neotree.  Since Doom Emacs uses 'SPC t' for 'toggle' keybindings, I used 'SPC t n' for toggle-neotree.
+;; (after! neotree
+;;   (setq neo-smart-open t
+;;         neo-window-fixed-size nil
+;;         neo-vc-integration t))
+;; (after! doom-themes
+;;   (setq doom-neotree-enable-variable-pitch t))
+;; (map! :leader
+;;       :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
+;;       :desc "Open directory in neotree"  "d n" #'neotree-dir)
 
-| COMMAND        | DESCRIPTION               | KEYBINDING |
-|----------------+---------------------------+------------|
-| neotree-toggle | /Toggle neotree/            | SPC t n    |
-| neotree- dir   | /Open directory in neotree/ | SPC d n    |
-
-#+BEGIN_SRC emacs-lisp
-(after! neotree
-  (setq neo-smart-open t
-        neo-window-fixed-size nil))
-(after! doom-themes
-  (setq doom-neotree-enable-variable-pitch t))
-(map! :leader
-      :desc "Toggle neotree file viewer" "t n" #'neotree-toggle
-      :desc "Open directory in neotree"  "d n" #'neotree-dir)
-#+END_SRC
-
-* OPEN SPECIFIC FILES
-Keybindings to open files that I work with all the time using the find-file command, which is the interactive file search that opens with 'C-x C-f' in GNU Emacs or 'SPC f f' in Doom Emacs.  These keybindings use find-file non-interactively since we specify exactly what file to open.  The format I use for these bindings is 'SPC =' plus 'key' since Doom Emacs does not use 'SPC ='.
-
-=NOTE=: Doom Emacs already has a function 'doom/open-private-config' set to the keybinding 'SPC f p'.  This allows you to open any file in your HOME/.config/doom directory, so the following keybindings that I created are not really necessary, but I created this section as an example of how to to create bindings that open specific files on your system.
-
-| PATH TO FILE                  | DESCRIPTION                 | KEYBINDING |
-|-------------------------------+-----------------------------+------------|
-| ~/.config/doom/start.org      | /Edit start.org (start page)/ | SPC = =    |
-| ~/nc/Org/agenda.org           | /Edit agenda file/            | SPC = a    |
-| ~/.config/doom/config.org     | /Edit doom config.org/        | SPC = c    |
-| ~/.config/doom/init.el        | /Edit doom init.el/           | SPC = i    |
-| ~/.config/doom/packages.el    | /Edit doom packages.el/       | SPC = p    |
-| ~/.config/doom/eshell/aliases | /Edit eshell aliases/         | SPC = e a  |
-| ~/.config/doom/eshell/profile | /Edit eshell profile/         | SPC = e p  |
-
-#+BEGIN_SRC emacs-lisp
 (map! :leader
       (:prefix ("=" . "open file")
        :desc "Edit agenda file"      "=" #'(lambda () (interactive) (find-file "~/.config/doom/start.org"))
@@ -800,14 +436,7 @@ Keybindings to open files that I work with all the time using the find-file comm
       (:prefix ("= e" . "open eshell files")
        :desc "Edit eshell aliases"   "a" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
        :desc "Edit eshell profile"   "p" #'(lambda () (interactive) (find-file "~/.config/doom/eshell/profile"))))
-#+END_SRC
 
-* ORG MODE
-I wrapped most of this block in (after! org).  Without this, my settings might be evaluated too early, which will result in my settings being overwritten by Doom's defaults.  I have also enabled org-journal, org-superstar and org-roam by adding (+journal +pretty +roam2) to the org section of my Doom Emacs init.el.
-
-=NOTE=: I have the location of my Org directory and Roam directory in $HOME
-
-#+BEGIN_SRC emacs-lisp
 (map! :leader
       :desc "Org babel tangle" "m B" #'org-babel-tangle)
 (after! org
@@ -826,101 +455,38 @@ I wrapped most of this block in (after! org).  Without this, my settings might b
             ("ddg" . "https://duckduckgo.com/?q=")
             ("wiki" . "https://en.wikipedia.org/wiki/"))
         org-table-convert-region-max-lines 20000
-        org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
-          '((sequence
-             "TODO(t)"           ; A task that is ready to be tackled
-             "ASSIGNMENTS(a)"    ; University Assignments
-             "BLOG(b)"           ; Blog writing assignments
-             "GYM(g)"            ; Things to accomplish at the gym
-             "PROJ(p)"           ; A project that contains other tasks
-             "ROCKETRY(r)"       ; Work for York Aerospace and Rocketry(YAR)
-             "VIDEO(v)"          ; Video assignments
-             "WAIT(w)"           ; Something is holding up this task
-             "|"                 ; The pipe necessary to separate "active" states and "inactive" states
-             "BACKLOG(b)"
-             "PLAN(p)"
-             "READY(r)"
-             "ACTIVE(a)"
-             "REVIEW(v)"
-             "WAIT(w@/!)"
-             "HOLD(h)"
-             "COMPLETED(c)"
-             "CANC(k@)"
-             "DONE(d)"           ; Task has been completed
-             "CANCELLED(c)" )))) ; Task has been cancelled
-#+END_SRC
+    ))
 
-** Org-agenda
-#+begin_src emacs-lisp
 (after! org
   (setq org-agenda-files '("~/Org/agenda.org")))
 
-(setq
-   ;; org-fancy-priorities-list '("[A]" "[B]" "[C]")
-   ;; org-fancy-priorities-list '("❗" "[B]" "[C]")
-   org-fancy-priorities-list '("🟥" "🟧" "🟨")
-   org-priority-faces
-   '((?A :foreground "#ff6c6b" :weight bold)
-     (?B :foreground "#98be65" :weight bold)
-     (?C :foreground "#c678dd" :weight bold))
-   org-agenda-block-separator 8411)
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
 
-(setq org-agenda-custom-commands
-      '(("v" "A better agenda view"
-         ((tags "PRIORITY=\"A\""
-                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                 (org-agenda-overriding-header "High-priority unfinished tasks:")))
-          (tags "PRIORITY=\"B\""
-                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                 (org-agenda-overriding-header "Medium-priority unfinished tasks:")))
-          (tags "PRIORITY=\"C\""
-                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                 (org-agenda-overriding-header "Low-priority unfinished tasks:")))
-          (tags "customtag"
-                ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                 (org-agenda-overriding-header "Tasks marked with customtag:")))
-
-          (agenda "")
-          (alltodo "")))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- (require 'org-habit)
-  (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 60)
+  (setq org-todo-keywords
+    '((sequence "TODO(t)" "NEXT(n)" "ASSIGNMENT(a)" "PROJECT(q)" "|" "DONE(d!)")
+      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(A)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
   (setq org-refile-targets
     '(("Archive.org" :maxlevel . 1)
       ("Tasks.org" :maxlevel . 1)))
 
-(advice-add 'org-refile :after 'org-save-all-org-buffers)
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
-  (setq org-tag-alist
-    '((:startgroup)
-       ; Put mutually exclusive tags here
-       (:endgroup)
-       ("@errand" . ?E)
-       ("@home" . ?H)
-       ("@work" . ?W)
-       ("agenda" . ?a)
-       ("planning" . ?p)
-       ("publish" . ?P)
-       ("batch" . ?b)
-       ("note" . ?n)
-       ("idea" . ?i)))
-
-  ;; Configure custom agenda views
   (setq org-agenda-custom-commands
    '(("d" "Dashboard"
      ((agenda "" ((org-deadline-warning-days 7)))
-      (todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))
+      (todo "ASSIGNMENT"
+        ((org-agenda-overriding-header "Assignments")))
       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-    ("n" "Next Tasks"
-     ((todo "NEXT"
-        ((org-agenda-overriding-header "Next Tasks")))))
+    ("a" "Assignments"
+     ((todo "ASSIGNMENT"
+        ((org-agenda-overriding-header "Assignments")))))
 
-    ("W" "Work Tasks" tags-todo "+work-email")
+    ("u" "Uni Tasks" tags-todo "+uni-email")
 
     ;; Low-effort next actions
     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
@@ -952,89 +518,34 @@ I wrapped most of this block in (after! org).  Without this, my settings might b
       (todo "COMPLETED"
             ((org-agenda-overriding-header "Completed Projects")
              (org-agenda-files org-agenda-files)))
+      (todo "PROJECT"
+            ((org-agenda-overriding-header "Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "ASSIGNMENT"
+            ((org-agenda-overriding-header "Active Assignments")
+             (org-agenda-files org-agenda-files)))
       (todo "CANC"
             ((org-agenda-overriding-header "Cancelled Projects")
              (org-agenda-files org-agenda-files)))))))
- (use-package org-agenda
-  :ensure nil
-  :bind (:map org-agenda-mode-map
-              ("C-n" . org-agenda-next-item)
-              ("C-p" . org-agenda-previous-item)
-              ("j" . org-agenda-goto)
-              ("X" . my/org-agenda-mark-done-next)
-              ("x" . my/org-agenda-mark-done))
-  :preface
-  (defun my/org-agenda-mark-done (&optional arg)
-    "Mark the current TODO as done in org-agenda."
-    (interactive "P")
-    (org-agenda-todo "DONE"))
 
-  (defun my/org-agenda-mark-done-next ()
-    "Mark the current TODO as done and add another task after it."
-    (interactive)
-    (org-agenda-todo "DONE")
-    (org-agenda-switch-to)
-    (org-capture 0 "t"))
-  :custom
-  (org-agenda-category-icon-alist
-   `(("home" ,(list (all-the-icons-faicon "home" :v-adjust -0.05)) nil nil :ascent center :mask heuristic)
-     ("inbox" ,(list (all-the-icons-faicon "inbox" :v-adjust -0.1)) nil nil :ascent center :mask heuristic)
-     ("people" ,(list (all-the-icons-material "people" :v-adjust -0.25)) nil nil :ascent center :mask heuristic)
-     ("work" ,(list (all-the-icons-material "work" :v-adjust -0.25)) nil nil :ascent center :mask heuristic)
-     ("routine" ,(list (all-the-icons-material "repeat" :v-adjust -0.25)) nil nil :ascent center :mask heuristic)
-     ))
-  (org-agenda-custom-commands
-   '(("d" "Dashboard"
-      ((agenda "" ((org-deadline-warning-days 7)))
-       (todo "NEXT"
-             ((org-agenda-overriding-header "Next Tasks")))
-       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("@uni" . ?u)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
 
-     ("n" "Next Tasks"
-      ((agenda "" ((org-deadline-warning-days 7)))
-       (todo "NEXT"
-             ((org-agenda-overriding-header "Next Tasks")))))
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-graph-column 60)
 
-     ("h" "Home Tasks" tags-todo "@home")
-     ("w" "Work Tasks" tags-todo "@work")
-
-     ("E" "Easy Tasks" tags-todo "easy")
-     ("C" "Challenging Tasks" tags-todo "challenging")
-
-     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-      ((org-agenda-overriding-header "Low Effort Tasks")
-       (org-agenda-max-todos 20)
-       (org-agenda-files org-agenda-files)))))
-  (org-agenda-dim-blocked-tasks t)
- ;; (org-agenda-files '("~/.personal/agenda"))
-  (org-agenda-inhibit-startup t)
-  (org-agenda-show-log t)
-  (org-agenda-skip-deadline-if-done t)
-  (org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled)
-  (org-agenda-skip-scheduled-if-done t)
-  (org-agenda-span 2)
-  (org-agenda-start-on-weekday 6)
-  (org-agenda-start-with-log-mode t)
-  (org-agenda-sticky nil)
-  (org-agenda-tags-column 90)
-  (org-agenda-time-grid '((daily today require-timed)))
-  (org-agenda-use-tag-inheritance t)
-  (org-columns-default-format "%14SCHEDULED %Effort{:} %1PRIORITY %TODO %50ITEM %TAGS")
-  (org-default-notes-file "~/.personal/agenda/inbox.org")
- ;; (org-directory "~/.personal")
-  (org-enforce-todo-dependencies t)
-  (org-habit-completed-glyph ?✓)
-  (org-habit-graph-column 80)
-  (org-habit-show-habits-only-for-today nil)
-  (org-habit-today-glyph ?‖)
-  (org-track-ordered-property-with-tag t))
-
-#+end_src
-
-** Org-auto-tangle
-=org-auto-tangle= allows you to add the option =#+auto_tangle: t= in your Org file so that it automatically tangles when you save the document.  I have made adding this to your file even easier by creating a function 'dt/insert-auto-tangle-tag' and setting it to a keybinding 'SPC i a'.
-
-#+begin_src emacs-lisp
 (use-package! org-auto-tangle
   :defer t
   :hook (org-mode . org-auto-tangle-mode)
@@ -1050,12 +561,8 @@ I wrapped most of this block in (after! org).  Without this, my settings might b
 
 (map! :leader
       :desc "Insert auto_tangle tag" "i a" #'dt/insert-auto-tangle-tag)
-#+end_src
 
-** Org Capture
-
-#+begin_src emacs-lisp
- (use-package org-capture
+(use-package org-capture
   :ensure nil
   :preface
   (defvar my/org-active-task-template
@@ -1145,12 +652,7 @@ I wrapped most of this block in (after! org).  Without this, my settings might b
       ("m" "Metrics Capture")
       ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
-#+end_src
 
-** Org fonts
-I have created an interactive function for each color scheme (M-x dt/org-colors-*).  These functions will set appropriate colors and font attributes for org-level fonts and the org-table font.
-
-#+begin_src emacs-lisp
 (defun dt/org-colors-doom-one ()
   "Enable Doom One colors for Org headers."
   (interactive)
@@ -1313,29 +815,16 @@ I have created an interactive function for each color scheme (M-x dt/org-colors-
 
 ;; Load our desired dt/org-colors-* theme on startup
 (dt/org-colors-doom-one)
-#+end_src
 
-** Org-export
-We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting to gemtext (for the gemini protocol).
-
-=NOTE=: I also enable ox-publish for converting an Org site into an HTML site, but that is done in init.el (org +publish).
-
-#+BEGIN_SRC emacs-lisp
 (use-package ox-man)
 (use-package ox-gemini)
-#+END_SRC
 
-** Org-journal
-#+begin_src emacs-lisp
 (setq org-journal-dir "~/nc/Org/journal/"
       org-journal-date-prefix "* "
       org-journal-time-prefix "** "
       org-journal-date-format "%B %d, %Y (%A) "
       org-journal-file-format "%Y-%m-%d.org")
-#+end_src
 
-** Org-publish
-#+begin_src emacs-lisp
 (setq org-publish-use-timestamps-flag nil)
 (setq org-export-with-broken-links t)
 (setq org-publish-project-alist
@@ -1453,23 +942,9 @@ We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting
          :auto-preamble t)
 
       ))
-#+end_src
 
-** Org-roam
-[[https://github.com/org-roam/org-roam][Org-roam]] is a plain-text knowledge management system.  Org-roam borrows principles from the =Zettelkasten= method, providing a solution for non-hierarchical note-taking.  It should also work as a plug-and-play solution for anyone already using Org-mode for their personal wiki.
-
-| COMMAND                | DESCRIPTION                        | KEYBINDING |
-|------------------------+------------------------------------+------------|
-| completion-at-point    | /Completion of node-insert at point/ | SPC n r c  |
-| org-roam-node-find     | /Find node or create a new one/      | SPC n r f  |
-| org-roam-graph         | /Show graph of all nodes/            | SPC n r g  |
-| org-roam-node-insert   | /Insert link to a node/              | SPC n r i  |
-| org-roam-capture       | /Capture to node/                    | SPC n r n  |
-| org-roam-buffer-toggle | /Toggle roam buffer/                 | SPC n r r  |
-
-#+begin_src emacs-lisp
 (after! org
-  (setq org-roam-directory "~/Org/roam/"
+  (setq org-roam-directory "~/Org/roam"
         org-roam-graph-viewer "/usr/bin/firefox"))
 
 (map! :leader
@@ -1480,34 +955,80 @@ We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting
        :desc "Insert node"         "i" #'org-roam-node-insert
        :desc "Capture to node"     "n" #'org-roam-capture
        :desc "Toggle roam buffer"  "r" #'org-roam-buffer-toggle))
-#+end_src
 
-** Miscellaneous Org Mode stuff
+(use-package! websocket
+    :after org-roam)
 
-#+begin_src emacs-lisp
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-#+end_src
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 
-* IRONY MODE AND CLANGD
+(use-package org-wild-notifier
+  :ensure t
+  :custom
+  (alert-default-style 'notifications)
+  (org-wild-notifier-alert-time '(1 10 30))
+  (org-wild-notifier-keyword-whitelist '("TODO" "NEXT" "ASSIGNMENT" "PROJECT"))
+  (org-wild-notifier-notification-title "Agenda Reminder")
+  :config
+  (org-wild-notifier-mode 1))
 
-#+begin_src emacs-lisp
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 0.5))
+
+;; Key Rebinds
+(evil-define-key 'normal org-mode-map (kbd "g l") 'org-down-element)
+(map! :leader :desc "org agenda" "a g" #'org-agenda)
+
+(setq org-latex-create-formula-image-program 'imagemagick)
+
+(setq org-latex-packages-alist
+      (quote (("" "color" t)
+          ("" "minted" t)
+          ("" "parskip" t)
+          ("" "tikz" t))))
+
+(setq org-preview-latex-default-process 'dvisvgm)
+
+(require 'org-src)
+(add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
+
+(defun my/resize-org-latex-overlays ()
+  (cl-loop for o in (car (overlay-lists))
+     if (eq (overlay-get o 'org-overlay-type) 'org-latex-overlay)
+     do (plist-put (cdr (overlay-get o 'display))
+		   :scale (expt text-scale-mode-step
+				text-scale-mode-amount))))
+(use-package org
+:hook (org-mode . (lambda () (add-hook 'text-scale-mode-hook #'my/resize-org-latex-overlays nil t))))
+
+;; (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (set-face-attribute 'org-indent nil
+                                :inherit '(org-hide fixed-pitch))))
+
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
 (add-hook 'objc-mode-hook 'irony-mode)
 
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
-#+end_src
 
-* CCLS
-
-#+begin_src emacs-lisp
 (use-package ccls
   :ensure t
   :config
   (setq ccls-executable "ccls")
   (setq lsp-prefer-flymake nil)
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc))
-  :hook ((c-mode c++-mode objc-mode) .
+  :hook ((c-mode c++-mode objc-mode c-ts-mode c++-ts-mode) .
          (lambda () (require 'ccls) (lsp))))
 
 (use-package lsp-mode
@@ -1516,29 +1037,9 @@ We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
   :config
   (lsp-enable-which-key-integration t))
-#+end_src
 
-* PASSWORD STORE
-Uses the standard Unix password store "pass".
-
-#+begin_src emacs-lisp
 (use-package! password-store)
-#+end_src
 
-* PERSPECTIVE
-Perspective provides multiple named workspaces (or "perspectives") in Emacs, similar to having multiple desktops in window managers like Awesome and XMonad.  Each perspective has its own buffer list and its own window layout, making it easy to work on many separate projects without getting lost in all the buffers.  Switching to a perspective activates its window configuration, and when in a perspective, only its buffers are available (by default).  Doom Emacs uses 'SPC some_key' for binding some of the perspective commands, so I used this binging format for the perspective bindings that I created..
-
-| COMMAND                    | DESCRIPTION                         | KEYBINDING |
-|----------------------------+-------------------------------------+------------|
-| persp-switch               | /Switch to perspective NAME/          | SPC DEL    |
-| persp-switch-to-buffer     | /Switch to buffer in perspective/     | SPC ,      |
-| persp-next                 | /Switch to next perspective/          | SPC ]      |
-| persp-prev                 | /Switch to previous perspective/      | SPC [      |
-| persp-add-buffer           | /Add a buffer to current perspective/ | SPC +      |
-| persp-remove-by-name       | /Remove perspective by name/          | SPC -      |
-| +workspace/switch-to-{0-9} | /Switch to workspace n/               | SPC 0-9    |
-
-#+begin_src emacs-lisp
 (map! :leader
       :desc "Switch to perspective NAME"       "DEL" #'persp-switch
       :desc "Switch to buffer in perspective"  "," #'persp-switch-to-buffer
@@ -1546,48 +1047,18 @@ Perspective provides multiple named workspaces (or "perspectives") in Emacs, sim
       :desc "Switch to previous perspective"   "[" #'persp-prev
       :desc "Add a buffer current perspective" "+" #'persp-add-buffer
       :desc "Remove perspective by name"       "-" #'persp-remove-by-name)
-#+end_src
 
-* PDF VIEW MODE
-Disable dark in pdf view mode
-
-#+begin_src emacs-lisp
 (add-hook 'pdf-view-mode (lambda () (pdf-view-themed-minor-mode -1)))
 
 (add-hook 'pdf-view-mode (lambda () (pdf-view-dark-minor-mode -1)))
-#+end_src
 
-
-* RAINBOW MODE
-Rainbox mode displays the actual color for any hex value color.  It's such a nice feature that I wanted it turned on all the time, regardless of what mode I am in.  The following creates a global minor mode for rainbow-mode and enables it (exception: org-agenda-mode since rainbow-mode destroys all highlighting in org-agenda).
-
-#+begin_src emacs-lisp
 (define-globalized-minor-mode global-rainbow-mode rainbow-mode
   (lambda ()
     (when (not (memq major-mode
                 (list 'org-agenda-mode)))
      (rainbow-mode 1))))
 (global-rainbow-mode 1 )
-#+end_src
 
-* REGISTERS
-Emacs registers are compartments where you can save text, rectangles and positions for later use. Once you save text or a rectangle in a register, you can copy it into the buffer once or many times; once you save a position in a register, you can jump back to that position once or many times.  The default GNU Emacs keybindings for these commands (with the exception of counsel-register) involves 'C-x r' followed by one or more other keys.  I wanted to make this a little more user friendly, and since I am using Doom Emacs, I choose to replace the 'C-x r' part of the key chords with 'SPC r'.
-
-| COMMAND                          | DESCRIPTION                      | KEYBINDING |
-|----------------------------------+----------------------------------+------------|
-| copy-to-register                 | /Copy to register/                 | SPC r c    |
-| frameset-to-register             | /Frameset to register/             | SPC r f    |
-| insert-register                  | /Insert contents of register/      | SPC r i    |
-| jump-to-register                 | /Jump to register/                 | SPC r j    |
-| list-registers                   | /List registers/                   | SPC r l    |
-| number-to-register               | /Number to register/               | SPC r n    |
-| counsel-register                 | /Interactively choose a register/  | SPC r r    |
-| view-register                    | /View a register/                  | SPC r v    |
-| window-configuration-to-register | /Window configuration to register/ | SPC r w    |
-| increment-register               | /Increment register/               | SPC r +    |
-| point-to-register                | /Point to register/                | SPC r SPC  |
-
-#+BEGIN_SRC emacs-lisp
 (map! :leader
       (:prefix ("r" . "registers")
        :desc "Copy to register" "c" #'copy-to-register
@@ -1601,19 +1072,7 @@ Emacs registers are compartments where you can save text, rectangles and positio
        :desc "Window configuration to register" "w" #'window-configuration-to-register
        :desc "Increment register" "+" #'increment-register
        :desc "Point to register" "SPC" #'point-to-register))
-#+END_SRC
 
-* SHELLS
-Settings for the various shells and terminal emulators within Emacs.
-
-| COMMAND             | DESCRIPTION                | KEYBINDING |
-|---------------------+----------------------------+------------|
-| eshell              | /Launch the eshell/          | SPC e s    |
-| +eshell/toggle      | /Toggle eshell popup window/ | SPC e t    |
-| counsel-esh-history | /Browse the eshell history/  | SPC e h    |
-| +vterm/toggle       | /Toggle vterm popup window/  | SPC v t    |
-
-#+BEGIN_SRC emacs-lisp
 (setq shell-file-name "/bin/zsh"
       vterm-max-scrollback 5000)
 (setq eshell-rc-script "~/.config/doom/eshell/profile"
@@ -1629,10 +1088,7 @@ Settings for the various shells and terminal emulators within Emacs.
       :desc "Eshell popup toggle"    "e t" #'+eshell/toggle
       :desc "Counsel eshell history" "e h" #'counsel-esh-history
       :desc "Vterm popup toggle"     "v t" #'+vterm/toggle)
-#+END_SRC
 
-* VTERM Toggle
-#+begin_src emacs-lisp
 (use-package vterm-toggle
   :after vterm
   :config
@@ -1654,10 +1110,7 @@ Settings for the various shells and terminal emulators within Emacs.
                   ;;(dedicated . t) ;dedicated is supported in emacs27
                   (reusable-frames . visible)
                   (window-height . 0.4))))
-#+end_src
 
-* GENERAL KEYBINDS
-#+begin_src emacs-lisp
 (use-package general
   :config
   (general-evil-setup)
@@ -1850,10 +1303,7 @@ Settings for the various shells and terminal emulators within Emacs.
     "w K" '(buf-move-up :wk "Buffer move up")
     "w L" '(buf-move-right :wk "Buffer move right"))
 )
-#+end_src
 
-* SPELLCHECK
-#+begin_src emacs-lisp
 (use-package flyspell)
 (use-package flycheck-aspell)
 (dolist (hook '(text-mode-hook))
@@ -1940,10 +1390,6 @@ Settings for the various shells and terminal emulators within Emacs.
   (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")))
 
-#+end_src
-
-* LaTeX CONFIGURATION
-#+begin_src emacs-lisp
 (use-package pdf-tools
   :ensure t
   :config
@@ -2055,72 +1501,36 @@ Settings for the various shells and terminal emulators within Emacs.
                         (lsp-deferred)))
   :custom (lsp-latex-build-on-save t))
 
-#+end_src
-
-* SPLITS
-I set splits to default to opening on the right using 'prefer-horizontal-split'.  I set a keybinding for 'clone-indirect-buffer-other-window' for when I want to have the same document in two splits.  The text of the indirect buffer is always identical to the text of its base buffer; changes made by editing either one are visible immediately in the other.  But in all other respects, the indirect buffer and its base buffer are completely separate.  For example, I can fold one split but other will be unfolded.
-
-#+BEGIN_SRC emacs-lisp
 (defun prefer-horizontal-split ()
   (set-variable 'split-height-threshold nil t)
   (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
 (add-hook 'markdown-mode-hook 'prefer-horizontal-split)
 (map! :leader
       :desc "Clone indirect buffer other window" "b c" #'clone-indirect-buffer-other-window)
-#+END_SRC
 
-* START PAGE
-Instead of using Doom's Dashboard or the Emacs Dashboard program, I have decided to just set an custom start file as my "dashboard" since it allows me more customization options.  I have added to the 'start-mode-hook' the argument 'read-only-mode'.  This is to prevent accidental editing of the start file, and to prevent clashes with the 'start-mode' specific keybindings.  You can toggle on/off read-only-mode with 'SPC t r'.
+;;(setq initial-buffer-choice "~/.config/doom/start.org")
 
-#+begin_src emacs-lisp
-(setq initial-buffer-choice "~/.config/doom/start.org")
-
-(define-minor-mode start-mode
-  "Provide functions for custom start page."
-  :lighter " start"
-  :keymap (let ((map (make-sparse-keymap)))
+;;(define-minor-mode start-mode
+ ;; "Provide functions for custom start page."
+ ;; :lighter " start"
+ ;; :keymap (let ((map (make-sparse-keymap)))
           ;;(define-key map (kbd "M-z") 'eshell)
-            (evil-define-key 'normal start-mode-map
-              (kbd "1") '(lambda () (interactive) (find-file "~/.config/doom/config.org"))
-              (kbd "2") '(lambda () (interactive) (find-file "~/.config/doom/init.el"))
-              (kbd "3") '(lambda () (interactive) (find-file "~/.config/doom/packages.el"))
-              (kbd "4") '(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
-              (kbd "5") '(lambda () (interactive) (find-file "~/.config/doom/eshell/profile")))
-          map))
+   ;;         (evil-define-key 'normal start-mode-map
+     ;;         (kbd "1") '(lambda () (interactive) (find-file "~/.config/doom/config.org"))
+      ;;        (kbd "2") '(lambda () (interactive) (find-file "~/.config/doom/init.el"))
+       ;;       (kbd "3") '(lambda () (interactive) (find-file "~/.config/doom/packages.el"))
+        ;;      (kbd "4") '(lambda () (interactive) (find-file "~/.config/doom/eshell/aliases"))
+         ;;     (kbd "5") '(lambda () (interactive) (find-file "~/.config/doom/eshell/profile")))
+         ;; map))
 
-(add-hook 'start-mode-hook 'read-only-mode) ;; make start.org read-only; use 'SPC t r' to toggle off read-only.
-(provide 'start-mode)
-#+end_src
+;;(add-hook 'start-mode-hook 'read-only-mode) ;; make start.org read-only; use 'SPC t r' to toggle off read-only.
+;;(provide 'start-mode)
 
-* WINNER MODE
-Winner mode has been included with GNU Emacs since version 20.  This is a global minor mode and, when activated, it allows you to “undo” (and “redo”) changes in the window configuration with the key commands 'SCP w <left>' and 'SPC w <right>'.
-
-#+BEGIN_SRC emacs-lisp
 (map! :leader
       (:prefix ("w" . "window")
        :desc "Winner redo" "<right>" #'winner-redo
        :desc "Winner undo" "<left>"  #'winner-undo))
-#+END_SRC
 
-* ZAP TO CHAR
-Emacs provides a 'zap-to-char' command that kills from the current point to a character.  It is bound to 'M-z' in standard GNU Emacs but since Doom Emacs uses 'SPC' as its leader key and does not have 'SPC z' binded to anything, it just makes since to use it for 'zap-to-char'.  Note that 'zap-to-char' can be used with the universal argument 'SPC u' to modify its behavior.  Examples of 'zap-to-char' usage are listed in the table below:
-
-| KEYBINDING                | WHAT IS DOES                                               |
-|---------------------------+------------------------------------------------------------|
-| SPC z e                   | /deletes all chars to the next occurrence of 'e'/            |
-| SPC u 2 SPC z e           | /deletes all chars to the second occurrence of 'e'/          |
-| SPC u - SPC z e           | /deletes all chars to the previous occurrence of 'e'/        |
-| SPC u - 2 SPC z e         | /deletes all chars to the second previous occurrence of 'e'/ |
-| SPC u 1 0 0 SPC u SPC z e | /deletes all chars to the 100th occurrence of 'e'/           |
-
-=TIP=: The universal argument (SPC u) can only take a single integer by default.  If you need to use a multi-digit number (like 100 in the last examplue in the table above), then you must terminate the universal argument with another 'SPC u' after typing the number.
-
-'zap-up-to-char' is an alternative command that does not zap the char specified.  It is binded to 'SPC Z'.  It can also be used in conjunction with the universal argument 'SPC u' in similar fashion to the the 'zap-to-char' examples above.
-
-* RUST DAP
-Rust Debugger
-
-#+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :ensure
   :init (exec-path-from-shell-initialize))
@@ -2168,13 +1578,8 @@ Rust Debugger
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
     (dap-auto-configure-mode +1))
-#+end_src
 
-* GIT GUTTER
-Git gutter indicators that show added/deleted/modified code blocks that haven’t been committed by git
-
-#+begin_src emacs-lisp
- (use-package git-gutter
+(use-package git-gutter
   :hook (prog-mode . git-gutter-mode)
   :config
   (setq git-gutter:update-interval 0.02))
@@ -2184,4 +1589,114 @@ Git gutter indicators that show added/deleted/modified code blocks that haven’
   (define-fringe-bitmap 'git-gutter-fr:added [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:modified [224] nil nil '(center repeated))
   (define-fringe-bitmap 'git-gutter-fr:deleted [128 192 224 240] nil nil 'bottom))
-#+end_src
+
+(require 'elcord)
+(elcord-mode)
+(setq elcord-display-project-name t)
+(setq elcord-display-line-numbers nil)
+
+(advice-add #'doom-highlight-non-default-indentation-h :override #'ignore)
+
+(map! :leader
+      :desc "Display the current project, and *only* the current project" "s t" #'treemacs-display-current-project-exclusively
+      :desc "Open treemacs and add the current project root to the workspace"  "s T" #'treemacs-add-and-display-current-project)
+
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 150
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . efs/org-mode-visual-fill))
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(defun line-space-increase ()
+  (setq line-spacing 6))
+
+(add-hook 'org-mode-hook 'line-space-increase)
+
+(setq browse-url-browser-function 'browse-url-generic)
+(setq browse-url-generic-program "firefox")
+
+(require 'treesit)
+
+(setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     (c "https://github.com/tree-sitter/tree-sitter-c")
+     (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     (rust "https://github.com/tree-sitter/tree-sitter-rust")
+     (latex "https://github.com/latex-lsp/tree-sitter-latex")
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+(add-hook 'cpp-hook #'c++-ts-mode)
+(add-hook 'c-hook #'c-ts-mode)
+(add-hook 'rustic-mode-hook 'rust-ts-mode)
+
+(use-package rustic
+:ensure t
+:config
+:hook ((rust-ts-mode lsp-rust-analyzer) .
+         (lambda () (require 'rustic) (lsp))))
+
+(use-package lsp-pyright
+:ensure t
+:config
+:hook ((python-ts-mode python-mode) .
+         (lambda () (require 'lsp-pyright) (lsp))))
+
+(use-package treesit-auto
+  :demand t
+  :config
+  (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
+;; (setq major-mode-remap-alist
+;;  '((cpp-mode . c++-ts-mode)
+;;    (c++-mode . c++-ts-mode)
+;;    (c-mode . c-ts-mode)))
+
+(require 'fast-scroll)
+;; If you would like to turn on/off other modes, like flycheck, add
+;; your own hooks.
+(add-hook 'fast-scroll-start-hook (lambda () (flycheck-mode -1)))
+(add-hook 'fast-scroll-end-hook (lambda () (flycheck-mode 1)))
+(add-hook 'fast-scroll-start-hook (lambda () (flyspell-mode -1)))
+(add-hook 'fast-scroll-end-hook (lambda () (flyspell-mode 1)))
+(add-hook 'fast-scroll-start-hook (lambda () (font-lock-mode -1)))
+(add-hook 'fast-scroll-end-hook (lambda () (font-lock-mode 1)))
+(fast-scroll-config)
+(fast-scroll-mode 1)
+
+(after! tex-mode
+  (map-delete sp-pairs 'LaTeX-mode)
+  (map-delete sp-pairs 'latex-mode)
+  (map-delete sp-pairs 'tex-mode)
+  (map-delete sp-pairs 'plain-tex-mode))
+
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
