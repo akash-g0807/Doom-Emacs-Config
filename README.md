@@ -173,6 +173,7 @@ Run `doom sync` after installing Doom Emacs.
 - In Emacs, run:
   - `M-x all-the-icons-install-fonts`
   - `M-x nerd-icons-install-fonts`
+  - `M-x dap-cpp-tools-setup`
 - If you have issues with not being able to preview inline LaTeX, such as equations, edit this file: `/etc/ImageMagick-6/policy.xml`
   - Change the line `<policy domain="coder" rights="none" pattern="PDF" />` to: `<policy domain="coder" rights="read|write" pattern="PDF" />`
 - On Pop!_OS `libstdc++-12-dev` is not installed by default:

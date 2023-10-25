@@ -305,9 +305,9 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
        :desc "Evaluate last sexpression" "l" #'eval-last-sexp
        :desc "Evaluate elisp in region"  "r" #'eval-region))
 
-(setq doom-font (font-spec :family "JetBrains Mono" :size 13)
-      doom-variable-pitch-font (font-spec :family "Cantarell" :size 17)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 22))
+(setq doom-font (font-spec :family "JetBrains Mono" :size 26)
+      doom-variable-pitch-font (font-spec :family "Cantarell" :size 34)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 44))
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
