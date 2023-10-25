@@ -1472,7 +1472,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 	    (setq TeX-source-correlate-method 'synctex) ; enable synctex
 
 	    (setq TeX-source-correlate-mode t) ; enable text-source-correlate using synctex
-	    (TeX-fold-mode 1); enableing tex fold mode for better readability.
+	    ;;(TeX-fold-mode 1); enableing tex fold mode for better readability.
 ;;	    (TeX-fold-buffer 1)
 	    (setq-default TeX-master nil)
 	    (global-set-key (kbd "C-c C-g") 'pdf-sync-forward-search) ;sync from text to pdf
