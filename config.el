@@ -210,6 +210,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   ; ("g t" . centaur-tabs-forward)
   ; ("g T" . centaur-tabs-backward))
  )
+(add-hook 'server-after-make-frame-hook 'centaur-tabs-mode)
 
 (map! :leader
       (:prefix ("c h" . "Help info from Clippy")
