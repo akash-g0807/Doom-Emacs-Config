@@ -116,6 +116,12 @@ sudo apt install xclip
 
 ```
 
+- **Install glslang-tools**
+
+``` bash
+sudo apt install glslang-tools
+```
+
 **Other packages**
 
 In-case issues happen:
