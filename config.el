@@ -982,7 +982,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   :config
   (org-wild-notifier-mode 1))
 
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 0.5))
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.25))
 
 ;; Key Rebinds
 (evil-define-key 'normal org-mode-map (kbd "g l") 'org-down-element)
