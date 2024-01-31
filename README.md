@@ -1,13 +1,23 @@
-# Doom Emacs Config
+# DOOM EMACS CONFIG MACOS
 
-## Images
+# IMAGES
 
-![screenshot1](./images/screenshot1.png)
+## Install Brew
 
-![screenshot2](./images/screenshot2.png)
+``` bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 ## Literate Config
 Found in: [config.org](./config.org)
+
+# Install Emacs
+On Mac-OS I use the [Emacs-plus](https://github.com/d12frosted/homebrew-emacs-plus) distribution.
+
+``` bash
+brew tap d12frosted/emacs-plus
+brew install emacs-plus@29 --with-ctags --with-poll --with-debug --with-dbus --with-modern-pen-lds56-icon --with-native-comp --with-mailutils --with-imagemagick
+```
 
 ## Pre-requisites
 
@@ -19,36 +29,48 @@ Install the Ubuntu fonts from here: [Ubuntu Fonts](https://design.ubuntu.com/fon
 > [!NOTE]
 > The variable pitch font for `org-mode` files use Cantarall font. Should be installed by default on distros like Ubuntu and Pop!_OS. If not, please download and install this font as well.
 
-- **Install essential build tools**
-
-``` bash
-sudo apt install build-essential
-```
-
 - **Install `cmake`**
 
 Needed to compile vterm
 
 ``` bash
-sudo apt install cmake
+brew install cmake
 ```
 
 - **Install pip**
 
 ``` bash
-sudo apt install python3-pip
+python3 -m ensurepip
 ```
 
 - **Install Pyright LSP Server**
 
 ``` bash
-pip install pyright
+brew install pyright
 ```
 
-- **Install CCLS LSP Server**
+- **C-Library to increase magit speed**
 
 ``` bash
-sudo apt install ccls
+brew install libgit2
+```
+
+- **GNU file, shell and text utilities**
+
+``` bash
+brew install coreutils
+```
+
+- **Install MacTex**
+
+``` bash
+brew install mactex
+```
+
+- **CCLS**
+
+``` bash
+brew install ccls
 ```
 
 - **Install Rust and `rust-analyzer`**
@@ -71,90 +93,113 @@ rustup update
 
 Installation instructions: [texlab GitHub](https://github.com/latex-lsp/texlab)
 
-- **OPTIONAL: Install `texlive`**
-
-If you want to use LaTeX with Emacs
-
-``` bash
-sudo apt install texlive-full
-```
-
 - **Install GDB**
 
 `gdb` is used for Rust and C/C++ debugging.
 
 ``` bash
-sudo apt install gdb
+brew install gdb
 ```
 
-- **Install `gnome-screenshot`**
-
-This is needed for `org-download-clipboard` to work.
-
-``` bash
-sudo apt install gnome-screenshot
-```
-
-- **Install `graphviz`**
+ - **Install `graphviz`**
 
 This is needed for `org-roam` to generate graph visualisations.
 
 ``` bash
-sudo apt install graphviz
+brew install graphviz
 ```
 
 - **Install `ripgrep`**
 
 ``` bash
-sudo apt install ripgrep
+brew install ripgrep
 ```
 
 - **Install X11 Clipboard**
 
 ``` bash
-sudo apt install xclip
-
+brew install xclip
 ```
 
 - **Install glslang-tools**
 
 ``` bash
-sudo apt install glslang-tools
+brew install glslang
 ```
 
-**Other packages**
-
-In-case issues happen:
-
-- `libtool-bin` is needed to compile `vterm`
-
-- `wl-clipboard` on wayland
-
-- `aspell`
-
-- `fd`
-
-<!-- ``` bash -->
-<!-- sudo apt install libtool -->
-<!-- sudo apt install libtool-bin -->
-<!-- ``` -->
-
-<!-- libtool-bin -->
-
-- **Install `imagemagick`**
+- **Install libtool**
 
 ``` bash
-sudo apt install imagemagick
+brew install libtool
 ```
 
-- **Install `dvipng` and `dvisvgm`**
+- **Install aspell**
 
-Just incase it is not installed by default in your distro.
-
-```bash
-sudo apt install dvipng
-sudo apt install dvisvgm
+``` bash
+brew install aspell
 ```
+
+- **Install fd**
+
+``` bash
+brew install fd
+```
+
+- **imagemagick**
+
+``` bash
+brew install imagemagick
+```
+
+- **dvisvgm and macsvg**
+
+``` bash
+brew install --cask macsvg
+```
+
+dvisvgm and dvipg hould be installed by default but if not run the following command after installing mactex
+
+``` bash
+sudo tlmgr update --self 
+sudo /Library/TeX/texbin/tlmgr install dvisvgm
+sudo /Library/TeX/texbin/tlmgr install dvipng
+```
+
+Or build from source: [Script download here](https://gist.github.com/tobywf/aeeeee63053aaaa841b4032963406684)
+
+- **Install pyenv**
+
+``` bash
+brew install pyenv
+```
+
+- **Install pipvenv**
+
+``` bash
+brew install pipvenv
+```
+
+- **Install pytest**
+
+``` bash
+brew install pytest
+```
+
+- **Install cpptest**
+
+``` bash
+brew install cpptest
+```
+
+
+- **Install png paste**
+
+Needed to make org-download work
+
+``` bash
+brew install pngpaste
+```
+
 
 ## Installation
 
@@ -180,13 +225,8 @@ Run `doom sync` after installing Doom Emacs.
   - `M-x all-the-icons-install-fonts`
   - `M-x nerd-icons-install-fonts`
   - `M-x dap-cpp-tools-setup`
-- If you have issues with not being able to preview inline LaTeX, such as equations, edit this file: `/etc/ImageMagick-6/policy.xml`
-  - Change the line `<policy domain="coder" rights="none" pattern="PDF" />` to: `<policy domain="coder" rights="read|write" pattern="PDF" />`
-- On Pop!_OS `libstdc++-12-dev` is not installed by default:
-```bash
-sudo apt install libstdc++-12-dev
-```
-- On KDE, comment out the Wayland Integration section in `config.org` to fix clibboard issues.
+  - `M-x dap-codelldb-setup`
+
 - `M-x treesit-install-language-grammar`
 - `M-x customize-group` and change elcord to use `ts-mode` to have the correct Discord rich presence icon.
 ## TODO
