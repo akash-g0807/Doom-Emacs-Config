@@ -76,6 +76,7 @@
 - [[#treesit][TREESIT]]
 - [[#fast-scroll][FAST SCROLL]]
 - [[#copilot][COPILOT]]
+- [[#elpy][ELPY]]
 
 * ABOUT THIS CONFIG
 This is my personal Doom Emacs config.  Doom Emacs is a distribution of Emacs that uses the "evil" keybindings (Vim keybindings) and includes a number of nice extensions and a bit of configuration out of the box.  I am maintaining this config not just for myself, but also for those that want to explore some of what is possible with Emacs.  I will add a lot of examples of plugins and settings, some of them I may not even use personally.
@@ -2526,4 +2527,13 @@ This is for Discord rich presence
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+#+end_src
+
+* ELPY
+
+#+begin_src emacs-lisp
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
 #+end_src

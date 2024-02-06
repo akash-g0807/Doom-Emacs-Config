@@ -75,7 +75,7 @@
 (package! olivetti)
 (package! company)
 (package! ccls)
-;;(package! platformio-mode)
+(package! platformio-mode)
 (package! org-wild-notifier)
 (package! vterm-toggle)
 (package! auctex-latexmk)
@@ -103,3 +103,4 @@
 (package! format-all)
 (package! treesit-auto)
 (package! exec-path-from-shell)
+(package! elpy)

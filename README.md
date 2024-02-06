@@ -29,6 +29,19 @@ Install the Ubuntu fonts from here: [Ubuntu Fonts](https://design.ubuntu.com/fon
 > [!NOTE]
 > The variable pitch font for `org-mode` files use Cantarall font. Should be installed by default on distros like Ubuntu and Pop!_OS. If not, please download and install this font as well.
 
+- **Install XCode tools**
+
+``` bash
+xcode-select --install
+```
+
+- **Install lldb**
+
+``` bash
+lldb
+```
+This will prompt and install. Do the same for `git`
+
 - **Install `cmake`**
 
 Needed to compile vterm
@@ -203,7 +216,7 @@ brew install pngpaste
 
 ## Installation
 
-1. First install Emacs. Latest version is recommended. On Ubuntu 22.04 LTS based Linux distributions, you can use snap to install latest version.
+1. First install Emacs. Latest version is recommended. Use the instructions above
 2. Install Doom Emacs:
 
 ``` bash
@@ -213,11 +226,13 @@ git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 More details about Doom Emacs can be found in the GitHub page: [Doom Emacs GitHub](https://github.com/doomemacs/doomemacs)
 
 Run `doom sync` after installing Doom Emacs.
+Rm `doom env` after installing Doom Emacs
 
 3. Download the repo and copy the contents of this repo to the directory: `~/.config/doom`
 4. Run `doom sync` command after copying the contents.
 5. Create a folder `+STORE` in your home directory
 6. Add `export PATH="$HOME/.config/emacs/bin/:$PATH"` to your `~/.zshrc` or `~/.bashrc`
+7. Run `doom doctor` and install any software you need/want to
 
 ## Post Install
 

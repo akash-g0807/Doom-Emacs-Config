@@ -1919,3 +1919,8 @@ CONF is regular dap-mode launch configuration. Return the result."
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
