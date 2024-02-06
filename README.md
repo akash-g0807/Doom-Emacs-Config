@@ -42,6 +42,38 @@ lldb
 ```
 This will prompt and install. Do the same for `git`
 
+- **Install git-secrets**
+
+``` bash
+brew install git-secrets
+```
+
+- **Install git-extras**
+
+``` bash
+brew install git-extras
+```
+
+-**Install dbus**
+
+``` bash
+brew install dbus
+```
+
+- **Install npm and nodejs**
+Required to make copilot work
+
+``` bash
+brew install npm
+brew install node
+```
+
+- **Install Maccy**
+
+``` bash
+brew install maccy
+```
+
 - **Install `cmake`**
 
 Needed to compile vterm
@@ -204,6 +236,12 @@ brew install pytest
 brew install cpptest
 ```
 
+- **Install python-json5**
+
+``` bash
+brew install python-json5
+brew install python-yq
+```
 
 - **Install png paste**
 
@@ -212,7 +250,6 @@ Needed to make org-download work
 ``` bash
 brew install pngpaste
 ```
-
 
 ## Installation
 
