@@ -1537,7 +1537,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
          :MIMode: "lldb"
          :miDebuggerPath "rust-lldb"
          :environment []
-         :program "${workspaceFolder}/target/debug/hello / replace with binary"
+         :program "${workspaceFolder}/target/debug/hello"
          :cwd "${workspaceFolder}"
          :dap-compilation "cargo build"
          :dap-compilation-dir "${workspaceFolder}"
