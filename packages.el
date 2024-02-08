@@ -96,7 +96,8 @@
 (package! cl-lib)
 (package! visual-fill-column)
 (unpin! org-roam)
-(package! org-roam-ui :recipe (:host github :repo "jgru/org-roam-ui" :branch "add-export-capability"))
+;; (package! org-roam-ui :recipe (:host github :repo "jgru/org-roam-ui" :branch "add-export-capability"))
+(package! org-roam-ui :recipe (:host github :repo "uncomfyhalomacro/org-roam-ui" :branch "feature/add-export-functionality"))
 (package! fast-scroll)
 (package! copilot
   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
