@@ -271,6 +271,14 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 (setq delete-by-moving-to-trash t
       trash-directory "~/.local/share/Trash/files/")
 
+(require 'org-html-themify)
+
+(setq org-html-themify-themes
+      '((dark . doom-zenburn)
+        (light . doom-one-light)))
+
+(add-hook 'org-mode-hook 'org-html-themify-mode)
+
 (setq doom-theme 'doom-palenight)
 (map! :leader
       :desc "Load new theme" "h t" #'counsel-load-theme)
@@ -998,11 +1006,11 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
             (set-face-attribute 'org-indent nil
                                 :inherit '(org-hide fixed-pitch))))
 
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'objc-mode-hook 'irony-mode)
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'objc-mode-hook 'irony-mode)
 
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
+;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
 
 (use-package ccls
   :ensure t

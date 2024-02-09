@@ -96,7 +96,7 @@
 (package! cl-lib)
 (package! visual-fill-column)
 (unpin! org-roam)
-;; (package! org-roam-ui :recipe (:host github :repo "jgru/org-roam-ui" :branch "add-export-capability"))
+;;(package! org-roam-ui :recipe (:host github :repo "jgru/org-roam-ui" :branch "add-export-capability") :disable t)
 (package! org-roam-ui :recipe (:host github :repo "uncomfyhalomacro/org-roam-ui" :branch "feature/add-export-functionality"))
 (package! fast-scroll)
 (package! copilot
@@ -105,3 +105,4 @@
 (package! treesit-auto)
 (package! exec-path-from-shell)
 (package! elpy)
+(package! org-html-themify :recipe (:host github :repo "DogLooksGood/org-html-themify" :files ("*.el" "*.js" "*.css")))

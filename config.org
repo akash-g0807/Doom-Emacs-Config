@@ -22,6 +22,7 @@
   - [[#keybindings-within-dired][Keybindings Within Dired]]
   - [[#keybindings-within-dired-with-peep-dired-mode-enabled][Keybindings Within Dired With Peep-Dired-Mode Enabled]]
   - [[#making-deleted-files-go-to-trash-can][Making deleted files go to trash can]]
+  - [[#org-html-themify][Org-HTML-Themify]]
 - [[#doom-theme][DOOM THEME]]
 - [[#emojis][EMOJIS]]
 - [[#evaluate-elisp-expressions][EVALUATE ELISP EXPRESSIONS]]
@@ -526,6 +527,17 @@ If peep-dired is enabled, you will get image previews as you go up/down with 'j'
 cd ~/
 ln -s ~/.local/share/Trash .
 #+end_example
+
+** Org-HTML-Themify
+#+begin_src emacs-lisp
+(require 'org-html-themify)
+
+(setq org-html-themify-themes
+      '((dark . doom-zenburn)
+        (light . doom-one-light)))
+
+(add-hook 'org-mode-hook 'org-html-themify-mode)
+#+end_src
 
 * DOOM THEME
 Setting the theme to doom-one.  To try out new themes, I set a keybinding for counsel-load-theme with 'SPC h t'.
@@ -1454,11 +1466,11 @@ We need ox-man for "Org eXporting" to manpage format and ox-gemini for exporting
 * IRONY MODE AND CLANGD
 
 #+begin_src emacs-lisp
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'objc-mode-hook 'irony-mode)
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'objc-mode-hook 'irony-mode)
 
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
+;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-option)
 #+end_src
 
 * CCLS
