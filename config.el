@@ -418,7 +418,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 (map! :leader
       (:prefix ("=" . "open file")
        :desc "Edit agenda file"      "=" #'(lambda () (interactive) (find-file "~/.config/doom/start.org"))
-       :desc "Edit agenda file"      "a" #'(lambda () (interactive) (find-file "~/Org/agenda.org"))
+       :desc "Edit agenda file"      "a" #'(lambda () (interactive) (find-file "~/org/agenda.org"))
        :desc "Edit doom config.org"  "c" #'(lambda () (interactive) (find-file "~/.config/doom/config.org"))
        :desc "Edit doom init.el"     "i" #'(lambda () (interactive) (find-file "~/.config/doom/init.el"))
        :desc "Edit doom packages.el" "p" #'(lambda () (interactive) (find-file "~/.config/doom/packages.el"))))
