@@ -271,13 +271,13 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 (setq delete-by-moving-to-trash t
       trash-directory "~/.local/share/Trash/files/")
 
-(require 'org-html-themify)
+;; (require 'org-html-themify)
 
-(setq org-html-themify-themes
-      '((dark . doom-zenburn)
-        (light . doom-one-light)))
+;; (setq org-html-themify-themes
+;;       '((dark . doom-zenburn)
+;;         (light . doom-one-light)))
 
-(add-hook 'org-mode-hook 'org-html-themify-mode)
+;; (add-hook 'org-mode-hook 'org-html-themify-mode)
 
 (setq doom-theme 'doom-palenight)
 (map! :leader
