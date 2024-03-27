@@ -274,8 +274,8 @@ See also: https://stackoverflow.com/questions/9547912/emacs-calendar-show-more-t
 
 Let's also play around with calfw.
 #+begin_src emacs-lisp
-(use-package! calfw)
-(use-package! calfw-org)
+;; (use-package! calfw)
+;; (use-package! calfw-org)
 #+end_src
 
 * CENTAUR-TABS

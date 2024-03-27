@@ -113,8 +113,8 @@
 
 (defalias 'year-calendar 'dt/year-calendar)
 
-(use-package! calfw)
-(use-package! calfw-org)
+;; (use-package! calfw)
+;; (use-package! calfw-org)
 
 (setq centaur-tabs-set-bar 'over
       centaur-tabs-set-icons t

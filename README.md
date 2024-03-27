@@ -278,6 +278,7 @@ Rm `doom env` after installing Doom Emacs
   - `M-x nerd-icons-install-fonts`
   - `M-x dap-cpp-tools-setup`
   - `M-x dap-codelldb-setup`
+  - `M-x copilot-install-server`
 
 - `M-x treesit-install-language-grammar`
 - `M-x customize-group` and change elcord to use `ts-mode` to have the correct Discord rich presence icon.
