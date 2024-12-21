@@ -89,6 +89,7 @@
  '(neo-theme 'classic)
  '(neo-vc-integration '(face char))
  '(neo-window-position 'right)
+ '(org-safe-remote-resources '("\\`https://distro\\.tube\\(?:/\\|\\'\\)"))
  '(package-selected-packages '(dap-mode))
  '(treesit-font-lock-level 4))
 (custom-set-faces

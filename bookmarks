@@ -3,9 +3,9 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
- (filename . "~/Org/roam/20231029012218-axiom_of_completeness.org")
+ (filename . "~/Org/roam/20240210151345-machine_learning.org")
  (front-context-string)
- (rear-context-string . "of Completeness\n")
- (position . 99)
- (last-modified 25917 46028 232530 652000))
+ (rear-context-string . "achine-learning\n")
+ (position . 94)
+ (last-modified 26055 37549 752785 0))
 )

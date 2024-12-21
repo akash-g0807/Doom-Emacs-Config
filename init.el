@@ -34,8 +34,8 @@
        ;;fill-column       ; a `fill-column' indicator
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
-       ;; indent-guides     ; highlighted indent columns
-       ;; (ligatures +extras)         ; ligatures and symbols to make your code pretty again
+       indent-guides     ; highlighted indent columns
+       (ligatures +extras)         ; ligatures and symbols to make your code pretty again
        ;;minimap           ; show a map of the code on the side
        (modeline)          ; snazzy, Atom-inspired modeline, plus API
        ;;nav-flash         ; blink cursor line after big motions
@@ -106,7 +106,7 @@
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
-       ;;(:if IS-MAC macos)  ; improve compatibility with macOS
+       (:if IS-MAC macos)  ; improve compatibility with macOS
        tty               ; improve the terminal Emacs experience
 
        :lang
@@ -189,3 +189,6 @@
        :config
        literate
        (default +bindings +smartparens))
+
+(after! core-cli
+  (add-to-list 'doom-env-ignored-vars "^FZF_"))
