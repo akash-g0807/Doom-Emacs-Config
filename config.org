@@ -387,27 +387,6 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   ; ("g T" . centaur-tabs-backward))
  )
 (add-hook 'server-after-make-frame-hook 'centaur-tabs-mode)
-
-;; Enable centaur-tabs without faulty theming in daemon mode.
-(if (not (daemonp))
-	 (centaur-tabs-mode)
-
-  (defun centaur-tabs-daemon-mode (frame)
-	 (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
-		(run-at-time nil nil (lambda () (centaur-tabs-mode)))))
-  (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
-
-
-;;(use-package centaur-tabs
-;;  :custom
-;;  (centaur-tabs-style "bar")
-;;  (centaur-tabs-set-bar 'left)
-  ;; other settings here
-;;  :init
- ;; (if (daemonp)
- ;;     (add-hook 'server-after-make-frame-hook 'centaur-tabs-mode)
-;;    (add-hook 'after-init-hook 'centaur-tabs-mode))
-;;  )
 #+END_SRC
 
 * CLIPPY
@@ -2125,8 +2104,8 @@ Rust Debugger
   :ensure
   :config
   (dap-ui-mode)
-  (dap-ui-controls-mode 1)
-  (dap-auto-configure-mode t)
+  (dap-ui-controls-mode -1)
+  (dap-auto-configure-mode -1)
 
   (require 'dap-lldb)
   (require 'dap-codelldb)
@@ -2147,17 +2126,44 @@ Rust Debugger
          :dap-compilation-dir "${workspaceFolder}"
          :target nil
          :cwd nil)))
+(after! dap-mode
+  ;; Disable dap-ui-controls-mode
+  (dap-ui-controls-mode -1)
+
+  ;; Ensure it’s removed from all hooks
+  (remove-hook 'dap-stopped-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-terminated-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-disconnected-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-continue-hook #'dap-ui-controls-mode)
+
+  ;; Prevent its function from being called by overriding
+  (advice-add 'dap-ui-controls-mode :override #'ignore))
+
+
 
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
-    (dap-auto-configure-mode +1))
+    (dap-auto-configure-mode -1))
 
   (with-eval-after-load 'lsp-rust
     (require 'dap-cpptools))
 
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
-    (dap-auto-configure-mode +1))
+    (dap-auto-configure-mode -1))
+
+(map! :leader
+      (:prefix ("d" . "debug")
+       :desc "Start Debugging" "b" #'dap-debug              ;; Start a new debug session
+       :desc "Toggle Breakpoint" "t" #'dap-breakpoint-toggle ;; Toggle breakpoint at the current line
+       :desc "Continue" "c" #'dap-continue                  ;; Continue running the program
+       :desc "Step Over" "o" #'dap-next                     ;; Step Over the current line
+       :desc "Step Into" "i" #'dap-step-in                  ;; Step Into a function call
+       :desc "Step Out" "u" #'dap-step-out                  ;; Step Out of the current function
+       :desc "Restart" "r" #'dap-debug-restart             ;; Restart the debug session
+       :desc "Terminate" "t" #'dap-disconnect))             ;; Terminate the debug session
+
+
 #+end_src
 
 * LAUNCH JSON

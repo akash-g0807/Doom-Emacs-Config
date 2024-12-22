@@ -1551,8 +1551,8 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
   :ensure
   :config
   (dap-ui-mode)
-  (dap-ui-controls-mode 1)
-  (dap-auto-configure-mode t)
+  (dap-ui-controls-mode -1)
+  (dap-auto-configure-mode -1)
 
   (require 'dap-lldb)
   (require 'dap-codelldb)
@@ -1573,17 +1573,42 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
          :dap-compilation-dir "${workspaceFolder}"
          :target nil
          :cwd nil)))
+(after! dap-mode
+  ;; Disable dap-ui-controls-mode
+  (dap-ui-controls-mode -1)
+
+  ;; Ensure it’s removed from all hooks
+  (remove-hook 'dap-stopped-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-terminated-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-disconnected-hook #'dap-ui-controls-mode)
+  (remove-hook 'dap-continue-hook #'dap-ui-controls-mode)
+
+  ;; Prevent its function from being called by overriding
+  (advice-add 'dap-ui-controls-mode :override #'ignore))
+
+
 
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
-    (dap-auto-configure-mode +1))
+    (dap-auto-configure-mode -1))
 
   (with-eval-after-load 'lsp-rust
     (require 'dap-cpptools))
 
   (with-eval-after-load 'dap-mode
     (setq dap-default-terminal-kind "integrated") ;; Make sure that terminal programs open a term for I/O in an Emacs buffer
-    (dap-auto-configure-mode +1))
+    (dap-auto-configure-mode -1))
+
+(map! :leader
+      (:prefix ("d" . "debug")
+       :desc "Start Debugging" "b" #'dap-debug              ;; Start a new debug session
+       :desc "Toggle Breakpoint" "t" #'dap-breakpoint-toggle ;; Toggle breakpoint at the current line
+       :desc "Continue" "c" #'dap-continue                  ;; Continue running the program
+       :desc "Step Over" "o" #'dap-next                     ;; Step Over the current line
+       :desc "Step Into" "i" #'dap-step-in                  ;; Step Into a function call
+       :desc "Step Out" "u" #'dap-step-out                  ;; Step Out of the current function
+       :desc "Restart" "r" #'dap-debug-restart             ;; Restart the debug session
+       :desc "Terminate" "t" #'dap-disconnect))             ;; Terminate the debug session
 
 ;; dap-mode-launch-json.el --- support launch.json -*- lexical-binding: t -*-
 
