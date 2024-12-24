@@ -78,6 +78,7 @@
 - [[#fast-scroll][FAST SCROLL]]
 - [[#copilot][COPILOT]]
 - [[#elpy][ELPY]]
+- [[#locale-settings][LOCALE SETTINGS]]
 
 * ABOUT THIS CONFIG
 This is my personal Doom Emacs config.  Doom Emacs is a distribution of Emacs that uses the "evil" keybindings (Vim keybindings) and includes a number of nice extensions and a bit of configuration out of the box.  I am maintaining this config not just for myself, but also for those that want to explore some of what is possible with Emacs.  I will add a lot of examples of plugins and settings, some of them I may not even use personally.
@@ -1972,7 +1973,7 @@ Settings for the various shells and terminal emulators within Emacs.
 	    (setq TeX-source-correlate-method 'synctex)
 	    (setq TeX-auto-save t)
 	    (setq TeX-parse-self t)
-	    (setq-default TeX-master "paper.tex")
+	    (setq-default TeX-master "main.tex")
 	    (setq reftex-plug-into-AUCTeX t)
 	    (pdf-tools-install)
 	    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
@@ -2579,4 +2580,11 @@ This is for Discord rich presence
   :ensure t
   :init
   (elpy-enable))
+#+end_src
+
+* LOCALE SETTINGS
+
+#+begin_src emacs-lisp
+(setenv "LANG" "en_US.UTF-8")
+(setenv "LC_ALL" "en_US.UTF-8")
 #+end_src

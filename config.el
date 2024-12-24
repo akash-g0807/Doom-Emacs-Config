@@ -213,27 +213,6 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
  )
 (add-hook 'server-after-make-frame-hook 'centaur-tabs-mode)
 
-;; Enable centaur-tabs without faulty theming in daemon mode.
-(if (not (daemonp))
-	 (centaur-tabs-mode)
-
-  (defun centaur-tabs-daemon-mode (frame)
-	 (unless (and (featurep 'centaur-tabs) (centaur-tabs-mode-on-p))
-		(run-at-time nil nil (lambda () (centaur-tabs-mode)))))
-  (add-hook 'after-make-frame-functions #'centaur-tabs-daemon-mode))
-
-
-;;(use-package centaur-tabs
-;;  :custom
-;;  (centaur-tabs-style "bar")
-;;  (centaur-tabs-set-bar 'left)
-  ;; other settings here
-;;  :init
- ;; (if (daemonp)
- ;;     (add-hook 'server-after-make-frame-hook 'centaur-tabs-mode)
-;;    (add-hook 'after-init-hook 'centaur-tabs-mode))
-;;  )
-
 (map! :leader
       (:prefix ("c h" . "Help info from Clippy")
        :desc "Clippy describes function under point" "f" #'clippy-describe-function
@@ -1454,7 +1433,7 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 	    (setq TeX-source-correlate-method 'synctex)
 	    (setq TeX-auto-save t)
 	    (setq TeX-parse-self t)
-	    (setq-default TeX-master "paper.tex")
+	    (setq-default TeX-master "main.tex")
 	    (setq reftex-plug-into-AUCTeX t)
 	    (pdf-tools-install)
 	    (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
@@ -1979,3 +1958,6 @@ CONF is regular dap-mode launch configuration. Return the result."
   :ensure t
   :init
   (elpy-enable))
+
+(setenv "LANG" "en_US.UTF-8")
+(setenv "LC_ALL" "en_US.UTF-8")
