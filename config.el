@@ -296,9 +296,20 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
        :desc "Evaluate last sexpression" "l" #'eval-last-sexp
        :desc "Evaluate elisp in region"  "r" #'eval-region))
 
+(use-package! mixed-pitch
+  :hook (org-mode . mixed-pitch-mode)
+  :config
+  (setq mixed-pitch-set-heigth t)
+  (set-face-attribute 'variable-pitch nil :height 110))
 (setq doom-font (font-spec :family "JetBrains Mono" :size 12)
-      doom-variable-pitch-font (font-spec :family "Cantarell" :size 15)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 18))
+      doom-variable-pitch-font (font-spec :family "Cantarell" :size 16 :height 1.3)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 15))
+
+(after! mixed-pitch
+ (setq mixed-pitch-set-height t)
+  (setq variable-pitch-serif-font doom-variable-pitch-font)
+  (set-face-attribute 'variable-pitch nil :height 1.3)
+)
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
