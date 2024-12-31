@@ -62,7 +62,7 @@
 (package! mw-thesaurus)
 (package! org-auto-tangle)
 (package! org-web-tools)
-;;(package! ox-gemini)
+(package! ox-gemini)
 (package! peep-dired)
 (package! password-store)
 (package! rainbow-mode)

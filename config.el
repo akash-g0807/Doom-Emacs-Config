@@ -9,24 +9,24 @@
 ;;                                       (unless (and wl-copy-p (process-live-p wl-copy-p))
 ;;                                         (shell-command-to-string "wl-paste -n | tr -d '\r'")))))
 
-(use-package dashboard
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook))
+;; (use-package dashboard
+;;   :ensure t
+;;   :config
+;;   (dashboard-setup-startup-hook))
 
-(setq dashboard-startup-banner  2)
+;; (setq dashboard-startup-banner  2)
 
-(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+;; (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
-(setq dashboard-items '((recents  . 5)
-                        (bookmarks . 5)
-                        (projects . 5)
-                        (agenda . 5)
-                        (registers . 5)))
+;; (setq dashboard-items '((recents  . 5)
+;;                         (bookmarks . 5)
+;;                         (projects . 5)
+;;                         (agenda . 5)
+;;                         (registers . 5)))
 
-(setq dashboard-center-content t)
+;; (setq dashboard-center-content t)
 
-(setq doom-fallback-buffer "*dashboard*")
+;; (setq doom-fallback-buffer "*dashboard*")
 
 ;;(beacon-mode 1)
 
